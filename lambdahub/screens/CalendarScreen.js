@@ -1,9 +1,10 @@
 import { View, Text, StyleSheet } from "react-native";
+import AgendaScreen from "./AgendaScreen";
 
 export default function CalendarScreen() {
     return (
       <View style={styles.container}>
-        <Text>Calendar Screen</Text>
+        <AgendaScreen />
       </View>
     );
   }
@@ -11,8 +12,5 @@ export default function CalendarScreen() {
   const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: '#fff',
-      alignItems: 'center',
-      justifyContent: 'center',
     },
   });
