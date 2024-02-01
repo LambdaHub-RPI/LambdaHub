@@ -5,6 +5,7 @@ import AnnouncementScreen from './screens/AnnouncementScreen';
 import CalendarScreen from './screens/CalendarScreen';
 import DriverScreen from './screens/DriverScreen';
 import HomeScreen from './screens/HomeScreen';
+import QueueScreen from './screens/QueueScreen';
 
 
 const Drawer = createDrawerNavigator();

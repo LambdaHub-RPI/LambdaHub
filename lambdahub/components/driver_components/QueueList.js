@@ -1,6 +1,6 @@
 import { View, Text, FlatList, RefreshControl } from "react-native";
 import { DUMMY_DATA } from "../../data/dummy";
-import QueueItem from "./queue-item";
+import QueueItem from "./QueueItem";
 
 
 
@@ -14,15 +14,12 @@ const QueueList = () => {
                 data={DUMMY_DATA}        
                 keyExtractor={item=>item.id}
                 renderItem={renderItem}
-                refreshControl = {
+                refreshControl= {
                     <RefreshControl
-                        refreshing={false}
-                        onRefresh={()=>console.log("refreshing")}
+                        refreshing = {false}
+                        onRefresh={()=> console.log('refreshin')}
                     />
                 }
-                
-
-    
             />
 
         </View>
