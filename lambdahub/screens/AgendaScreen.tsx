@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {Alert, StyleSheet, Text, View, TouchableOpacity} from 'react-native';
 import {Agenda, DateData, AgendaEntry, AgendaSchedule} from 'react-native-calendars';
+import jsonData from '../data/CALENDAR_DATA.json'
 
 interface State {
   items?: AgendaSchedule;
@@ -11,16 +12,46 @@ export default class AgendaScreen extends Component<State> {
     items: undefined
   };
 
-  // reservationsKeyExtractor = (item, index) => {
-  //   return `${item?.reservation?.day}${index}`;
-  // };
+   //reservationsKeyExtractor = (item, index) => {
+   //  return `${item?.reservation?.day}${index}`;
+   //};
+
+  componentDidMount() {
+    // Load items from the dummy JSON file
+    this.loadItemsFromJson();
+  }
+
+  loadItemsFromJson = () => {
+    // Process the imported JSON data and populate the items state
+    const items: AgendaSchedule = {};
+    
+    jsonData.forEach((event) => {
+      const time = new Date(event.date).getTime();
+      const strTime = this.timeToString(time);
+
+      if (!items[strTime]) {
+        items[strTime] = [];
+      }
+
+      items[strTime].push({
+        name: event.title,
+        height: 100,
+        day: strTime
+      });
+    });
+
+    this.setState({ items });
+  };
+
+  date = new Date().toJSON();
 
   render() {
     return (
       <Agenda
+        
         items={this.state.items}
         loadItemsForMonth={this.loadItems}
-        selected={'2024-01-31'}
+        selected={this.date.split('T')[0]}
         renderItem={this.renderItem}
         renderEmptyDate={this.renderEmptyDate}
         rowHasChanged={this.rowHasChanged}
@@ -49,20 +80,12 @@ export default class AgendaScreen extends Component<State> {
     const items = this.state.items || {};
 
     setTimeout(() => {
-      for (let i = 0; i < 12; i++) {
+      for (let i = -15; i < 200; i++) {
         const time = day.timestamp + i * 24 * 60 * 60 * 1000;
         const strTime = this.timeToString(time);
 
         if (!items[strTime]) {
           items[strTime] = [];
-    
-          for (let j = 0; j < 1; j++) {
-            items[strTime].push({
-              name: 'Item for ' + strTime + ' test',
-              height: 100,
-              day: strTime
-            });
-          }
         }
       }
       
@@ -89,6 +112,7 @@ export default class AgendaScreen extends Component<State> {
 
     return (
       <TouchableOpacity
+        
         style={[styles.item, {height: reservation.height}]}
         onPress={() => Alert.alert(reservation.name)}
       >
@@ -100,7 +124,7 @@ export default class AgendaScreen extends Component<State> {
   renderEmptyDate = () => {
     return (
       <View style={styles.emptyDate}>
-        <Text>This is empty date!</Text>
+        <Text>No Events Scheduled Today</Text>
       </View>
     );
   };
@@ -116,7 +140,6 @@ export default class AgendaScreen extends Component<State> {
 }
 
 const styles = StyleSheet.create({
-  
   item: {
     backgroundColor: 'white',
     flex: 1,
