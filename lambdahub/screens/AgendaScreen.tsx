@@ -1,11 +1,25 @@
 import React, {Component} from 'react';
 import {Alert, StyleSheet, Text, View, TouchableOpacity} from 'react-native';
-import {Agenda, DateData, AgendaEntry, AgendaSchedule} from 'react-native-calendars';
+import {Agenda, DateData} from 'react-native-calendars';
 import jsonData from '../data/CALENDAR_DATA.json'
 
 interface State {
   items?: AgendaSchedule;
 }
+
+export type AgendaEntry = {
+  name: string;
+  height: number;
+  description: string;
+  starttime: string;
+  endtime: string;
+  day: string;
+}
+
+export type AgendaSchedule = {
+[date: string]: AgendaEntry[];
+}
+
 
 export default class AgendaScreen extends Component<State> {
   state: State = {
@@ -35,6 +49,9 @@ export default class AgendaScreen extends Component<State> {
 
       items[strTime].push({
         name: event.title,
+        starttime: event.starttime,
+        endtime: event.endtime,
+        description: event.description,
         height: 100,
         day: strTime
       });
@@ -112,19 +129,29 @@ export default class AgendaScreen extends Component<State> {
 
     return (
       <TouchableOpacity
-        
-        style={[styles.item, {height: reservation.height}]}
-        onPress={() => Alert.alert(reservation.name)}
-      >
-        <Text style={{fontSize, color}}>{reservation.name}</Text>
-      </TouchableOpacity>
+      style={[styles.item, {height: reservation.height}]}
+      onPress={() => this.showAgendaItemDetails(reservation)}
+    >
+      <View style={styles.itemContent}>
+        <Text style={styles.title}>{reservation.name}</Text>
+        <Text style={styles.time}>{reservation.starttime} - {reservation.endtime}</Text>
+        <Text style={styles.description}>{reservation.description}</Text>
+      </View>
+    </TouchableOpacity>
+    );
+  };
+
+  showAgendaItemDetails = (reservation: AgendaEntry) => {
+    Alert.alert(
+      reservation.name,
+      `Start Time: ${reservation.starttime}\nEnd Time: ${reservation.endtime}\nDescription: ${reservation.description}`
     );
   };
 
   renderEmptyDate = () => {
     return (
-      <View style={styles.emptyDate}>
-        <Text>No Events Scheduled Today</Text>
+      <View style={styles.emptyDateItem}>
+        <Text style={styles.emptyDateText}>No Events Scheduled Today</Text>
       </View>
     );
   };
@@ -142,16 +169,60 @@ export default class AgendaScreen extends Component<State> {
 const styles = StyleSheet.create({
   item: {
     backgroundColor: 'white',
-    flex: 1,
-    borderRadius: 5,
-    padding: 10,
-    marginRight: 10,
-    marginTop: 17
+    borderRadius: 20,
+    padding: 15,
+    marginHorizontal: 10,
+    marginLeft: 0,
+    marginTop: 10,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
-  emptyDate: {
-    height: 15,
+  itemContent: {
     flex: 1,
-    paddingTop: 30
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 5,
+    color: '#333',
+  },
+  time: {
+    fontSize: 14,
+    marginBottom: 5,
+    color: '#555',
+  },
+  description: {
+    fontSize: 14,
+    color: '#777',
+  },
+  emptyDateItem: {
+    backgroundColor: '#f0f0f0',
+    borderRadius: 10,
+    padding: 10,
+    marginHorizontal: 20,
+    marginTop: 10,
+    marginLeft: 0,
+    marginRight: 10,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 2,
+    
+  },
+  emptyDateText: {
+    fontSize: 16,
+    color: '#555',
+    textAlign: 'center',
   },
   customDay: {
     margin: 10,
