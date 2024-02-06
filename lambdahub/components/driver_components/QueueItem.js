@@ -8,7 +8,7 @@ const QueueItem = ({ id,requestors_name, fromWhere, toWhere, numPassengers }) =>
     const navigation = useNavigation()
     return (
 
-        <TouchableOpacity style={styles.card} onPress={() =>navigation.navigate("Ride", {rideId: id})}>
+        <TouchableOpacity style={styles.card} onPress={() =>navigation.navigate("Ride", {rideId: id, requestors_name, fromWhere, toWhere, numPassengers})}>
             <Text>{requestors_name} with {numPassengers} people.</Text>
             <Text>{fromWhere} to {toWhere}{'\n'}</Text>
         </TouchableOpacity>

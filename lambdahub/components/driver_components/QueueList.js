@@ -17,7 +17,6 @@ const QueueList = () => {
                 refreshControl= {
                     <RefreshControl
                         refreshing = {false}
-                        onRefresh={()=> console.log('refreshin')}
                     />
                 }
             />
