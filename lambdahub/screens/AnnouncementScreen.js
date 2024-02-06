@@ -1,15 +1,18 @@
 import React from 'react';
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, ScrollView } from "react-native";
 import { TextInput } from 'react-native-gesture-handler';
 import { Button } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import AnnouncementFormScreen from 'c:/Users/andraa2/Dropbox/LambdaHub-UI/lambdahub/screens/AnnouncementFormScreen';
 
-export default function AnnouncementScreen() {
-  const [input, setInput] = React.useState([''])
-  
+const Stack = createStackNavigator();
+
+function AnnouncementScreenContent({ navigation }){
+  const [input, setInput] = React.useState(['']);
+
   const handleAdd = () => {
-    const newInputs = [...input];
-    newInputs.push('');
-    setInput(newInputs);
+    navigation.navigate('AnnouncementForm');
   };
 
   const handleRemove = (index) => {
@@ -23,10 +26,10 @@ export default function AnnouncementScreen() {
     newInputs[index] = text;
     setInput(newInputs);
   };
-  
-  
+
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
+      <Button title="Create New Announcement" onPress={handleAdd} />
       <View>
         {input.map((input, index) => (
           <View key={index} style={styles.inputContainer}>
@@ -35,21 +38,33 @@ export default function AnnouncementScreen() {
               onChangeText={text => handleInputChange(text, index)}
               style={styles.input}
             />
-            <Button title="remove" onPress={() => handleRemove(index)} />
+            <Button title="X" onPress={() => handleRemove(index)} />
           </View>
         ))}
-        <Button title="add" onPress={handleAdd} />
       </View>
-    </View>
+    </ScrollView>
   );
-};
+
+}
+
+export default function AnnouncementScreen() {
+  return (
+      <Stack.Navigator initialRouteName="AnnouncementScreenContent"
+        screenOptions={{headerShown: false}}
+      >
+        <Stack.Screen name="Announcements" component={AnnouncementScreenContent} />
+        <Stack.Screen name="AnnouncementForm" component={AnnouncementFormScreen} />
+      </Stack.Navigator>
+  );
+}
   
   const styles = StyleSheet.create({
     container: {
-      flex: 1,
+
       backgroundColor: '#fff',
       alignItems: 'center',
       justifyContent: 'center',
+      padding: 10
     },
 
     inputContainer: {
@@ -59,13 +74,13 @@ export default function AnnouncementScreen() {
       borderColor: '#ccc',
       marginBottom: 10,
       padding: 5,
-      width: 300,
+      width: '95%',
       height: 50
     },
     
     input: {
-      width: 200,
-      height: 40,
+      flex: 1,
+      height: '100%',
       borderColor: 'gray',
       borderWidth: 1,
       marginRight: 10,
