@@ -32,7 +32,7 @@ const QueueItem = ({ id, requestors_name, fromWhere, toWhere, numPassengers }) =
                         <Text>{fromWhere} to {toWhere}</Text>
                         <View style={styles.buttonContainer}>
                             <TouchableOpacity style={[styles.button, styles.deleteButton]} onPress={handleDelete}>
-                                <Text style={styles.buttonText}>Delete Ride</Text>
+                                <Text style={styles.buttonText}>Complete Ride</Text>
                             </TouchableOpacity>
                             <TouchableOpacity style={[styles.button, styles.joinButton]} onPress={handleJoin}>
                                 <Text style={styles.buttonText}>Join Ride</Text>
