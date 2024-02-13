@@ -3,6 +3,14 @@ import React from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 
 export default function AnnouncementFormScreen() {
+  const [author, setAuthor] = useState('');
+  const [announcement, setAnnouncement] = useState('');
+  const [date, setDate] = useState('');
+
+  const handleSubmit = () => {
+    
+  };
+
   return (
     <View style={styles.container}>
       <Text>Author:</Text>
