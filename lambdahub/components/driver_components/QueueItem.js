@@ -1,106 +1,77 @@
 import React, { useState } from 'react';
-import { StyleSheet, TouchableOpacity, Text, Modal, View } from 'react-native';
+import { StyleSheet, Animated, PanResponder, Text, View } from 'react-native';
 
-const QueueItem = ({ id, requestors_name, fromWhere, toWhere, numPassengers }) => {
-    const [modalVisible, setModalVisible] = useState(false);
+const SlideableButton = ({ text, onDelete }) => {
+    const pan = useState(new Animated.ValueXY())[0];
 
-    const handleDelete = () => {
-        // Implement delete functionality here
-        setModalVisible(false); // Close modal after deletion
-    };
-
-    const handleJoin = () => {
-        // Implement join functionality here
-    };
+    const panResponder = useState(
+        PanResponder.create({
+            onStartShouldSetPanResponder: () => true,
+            onPanResponderMove: (_, gesture) => {
+                // Limit movement to the left
+                if (gesture.dx < -50) {
+                    pan.setValue({ x: gesture.dx, y: 0 });
+                }
+            },
+            onPanResponderRelease: (_, gesture) => {
+                if (gesture.dx < -150) {
+                    // If swiped far enough to the left, trigger onDelete
+                    Animated.timing(pan, {
+                        toValue: { x: -500, y: 0 },
+                        duration: 200,
+                        useNativeDriver: false,
+                    }).start(() => {
+                        onDelete();
+                    });
+                } else {
+                    // If not swiped far enough, reset position
+                    Animated.spring(pan, {
+                        toValue: { x: 0, y: 0 },
+                        useNativeDriver: false,
+                    }).start();
+                }
+            },
+        })
+    )[0];
 
     return (
-        <View>
-            <TouchableOpacity style={styles.card} onPress={() => setModalVisible(true)}>
-                <Text style={styles.cardText}>{requestors_name} with {numPassengers} people.</Text>
-                <Text>{fromWhere} to {toWhere}</Text>
-            </TouchableOpacity>
-
-            {/* Modal */}
-            <Modal
-                animationType="slide"
-                transparent={true}
-                visible={modalVisible}
-                onRequestClose={() => setModalVisible(false)}>
-                <View style={styles.modalContainer}>
-                    <View style={styles.modalContent}>
-                        <Text>{requestors_name}</Text>
-                        <Text>{fromWhere} to {toWhere}</Text>
-                        <View style={styles.buttonContainer}>
-                            <TouchableOpacity style={[styles.button, styles.deleteButton]} onPress={handleDelete}>
-                                <Text style={styles.buttonText}>Complete Ride</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={[styles.button, styles.joinButton]} onPress={handleJoin}>
-                                <Text style={styles.buttonText}>Join Ride</Text>
-                            </TouchableOpacity>
-                        </View>
-                        <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
-                            <Text style={styles.closeButtonText}>Close</Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
-            </Modal>
-        </View>
+        <Animated.View
+            style={[
+                styles.slideableButton,
+                {
+                    transform: [{ translateX: pan.x }],
+                },
+            ]}
+            {...panResponder.panHandlers}
+        >
+            <Text>{text}</Text>
+        </Animated.View>
     );
 };
 
+const QueueItem = ({ id, requestors_name, fromWhere, toWhere, numPassengers, onDelete }) => {
+    const [deleted, setDeleted] = useState(false);
+
+    const handleDelete = () => {
+        onDelete();
+        setDeleted(true); // Set the "Deleted" flag to true
+    };
+
+    return !deleted ? (
+        <SlideableButton
+            text={`${requestors_name} with ${numPassengers} passengers\n${fromWhere} to ${toWhere}`}
+            onDelete={handleDelete}
+        />
+    ) : null;
+};
+
 const styles = StyleSheet.create({
-    card: {
-        borderWidth: 1,
-        borderColor: '#c5c5c5',
-        borderRadius: 10,
-        marginVertical: 5,
-        padding: 30,
-    },
-    cardText: {
-        textAlign: 'center',
-    },
-    modalContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    },
-    modalContent: {
-        backgroundColor: 'white',
-        padding: 20,
-        borderRadius: 10,
-        elevation: 5,
-    },
-    buttonContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginVertical: 10,
-    },
-    button: {
-        width: '48%', // Adjust as needed
-        padding: 10,
-        borderRadius: 5,
-        alignItems: 'center',
-    },
-    deleteButton: {
-        backgroundColor: 'red',
-    },
-    joinButton: {
-        backgroundColor: 'green',
-    },
-    buttonText: {
-        color: 'white',
-        fontWeight: 'bold',
-    },
-    closeButton: {
-        marginTop: 10,
-        padding: 10,
+    slideableButton: {
         backgroundColor: '#c5c5c5',
+        padding: 10,
+        marginVertical: 5,
         borderRadius: 5,
         alignItems: 'center',
-    },
-    closeButtonText: {
-        color: 'black',
     },
 });
 
