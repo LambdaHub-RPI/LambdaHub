@@ -44,7 +44,7 @@ const SlideableButton = ({ text, onDelete }) => {
             ]}
             {...panResponder.panHandlers}
         >
-            <Text>{text}</Text>
+            <Text style={styles.slideableButtonText}>{text}</Text>
         </Animated.View>
     );
 };
@@ -67,11 +67,25 @@ const QueueItem = ({ id, requestors_name, fromWhere, toWhere, numPassengers, onD
 
 const styles = StyleSheet.create({
     slideableButton: {
-        backgroundColor: '#c5c5c5',
-        padding: 10,
-        marginVertical: 5,
-        borderRadius: 5,
+        backgroundColor: '#4CAF50',
+        padding: 15,
+        marginVertical: 10,
+        borderRadius: 10,
         alignItems: 'center',
+        justifyContent: 'center',
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
+    },
+    slideableButtonText: {
+        fontSize: 16,
+        color: '#fff',
+        textAlign: 'center',
     },
 });
 

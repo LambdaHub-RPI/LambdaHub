@@ -1,28 +1,49 @@
-import { View, Text, FlatList, RefreshControl } from "react-native";
-import { DUMMY_DATA } from "../../data/dummy";
-import QueueItem from "./QueueItem";
+import {StatusBar} from 'expo-status-bar';
+import { SafeAreaView,View, Text, StyleSheet, Platform, ScrollView, Button, TouchableOpacity} from "react-native";
+import QueueList from '../components/driver_components/QueueList';
+import { useNavigation } from "@react-navigation/native";
 
 
 
-const QueueList = () => {
-    const renderItem = ({item}) => {
-        return <QueueItem id={item.id} requestors_name={item.requestors_name} fromWhere={item.fromWhere} toWhere={item.toWhere} numPassengers={item.numPassengers}/>
-    }
-    return (
-        <View>
-            <FlatList
-                data={DUMMY_DATA}        
-                keyExtractor={item=>item.id}
-                renderItem={renderItem}
-                refreshControl= {
-                    <RefreshControl
-                        refreshing = {false}
-                    />
-                }
-            />
 
-        </View>
+const QueueScreen = () => {
 
-    );
+  return (
+
+    <SafeAreaView>
+      
+
+        <View style={styles.secondContainer}>
+
+          <QueueList/>
+        </View>        
+      
+      <StatusBar style = 'dark' />
+    </SafeAreaView> 
+  );
+
 }
-export default QueueList;
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: '#fff',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    secondContainer: {
+      backgroundColor: 'white',
+      height: 1600,
+      padding: 40
+    },
+
+    btn: {
+      padding: 10, 
+      backgroundColor : 'black',
+       width: 150,
+       height: 120,
+      justifyContent: 'center',
+      alignItems: 'center'
+    }
+  });
+
+export default QueueScreen;

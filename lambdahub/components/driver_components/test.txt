@@ -1,106 +1,53 @@
-import React, { useState } from 'react';
-import { StyleSheet, TouchableOpacity, Text, Modal, View } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, FlatList, RefreshControl, Alert } from 'react-native';
+import { DUMMY_DATA } from '../../data/dummy';
+import QueueItem from './QueueItem';
 
-const QueueItem = ({ id, requestors_name, fromWhere, toWhere, numPassengers }) => {
-    const [modalVisible, setModalVisible] = useState(false);
+const QueueList = () => {
+    const [queueData, setQueueData] = useState(DUMMY_DATA);
+    const [showEndOfListAlert, setShowEndOfListAlert] = useState(true);
 
-    const handleDelete = () => {
-        // Implement delete functionality here
-        setModalVisible(false); // Close modal after deletion
+    useEffect(() => {
+        const allDeleted = queueData.every(item => item.deleted);
+        if (allDeleted) {
+            Alert.alert('End of List', 'No more items to display.');
+        }
+    }, [queueData]);
+
+    const handleDelete = (id) => {
+        setQueueData(prevData =>
+            prevData.map(item => (item.id === id ? { ...item, deleted: true } : item))
+        );
+        setShowEndOfListAlert(false);
     };
 
-    const handleJoin = () => {
-        // Implement join functionality here
+    const renderItem = ({ item }) => {
+        return (
+            <QueueItem
+                id={item.id}
+                requestors_name={item.requestors_name}
+                fromWhere={item.fromWhere}
+                toWhere={item.toWhere}
+                numPassengers={item.numPassengers}
+                onDelete={() => handleDelete(item.id)}
+            />
+        );
+    };
+
+    const handleRefresh = () => {
+        // Handle refreshing the list (e.g., fetching new data from backend)
     };
 
     return (
-        <View>
-            <TouchableOpacity style={styles.card} onPress={() => setModalVisible(true)}>
-                <Text style={styles.cardText}>{requestors_name} with {numPassengers} people{'\n'}{fromWhere} to {toWhere}</Text>
-            </TouchableOpacity>
-
-            {/* Modal */}
-            <Modal
-                animationType="slide"
-                transparent={true}
-                visible={modalVisible}
-                onRequestClose={() => setModalVisible(false)}>
-                <View style={styles.modalContainer}>
-                    <View style={styles.modalContent}>
-                        <Text>{requestors_name}</Text>
-                        <Text>{fromWhere} to {toWhere}</Text>
-                        <View style={styles.buttonContainer}>
-                            <TouchableOpacity style={[styles.button, styles.deleteButton]} onPress={handleDelete}>
-                                <Text style={styles.buttonText}>Complete Ride</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={[styles.button, styles.joinButton]} onPress={handleJoin}>
-                                <Text style={styles.buttonText}>Join Ride</Text>
-                            </TouchableOpacity>
-                        </View>
-                        <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
-                            <Text style={styles.closeButtonText}>Close</Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
-            </Modal>
+        <View style={{ flex: 1 }}>
+            <FlatList
+                data={queueData}
+                keyExtractor={item => item.id}
+                renderItem={renderItem}
+                refreshControl={<RefreshControl refreshing={false} onRefresh={handleRefresh} />}
+            />
         </View>
     );
 };
 
-const styles = StyleSheet.create({
-    card: {
-        borderWidth: 1,
-        borderColor: '#c5c5c5',
-        borderRadius: 10,
-        marginVertical: 5,
-        padding: 30,
-    },
-    cardText: {
-        textAlign: 'center',
-    },
-    modalContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    },
-    modalContent: {
-        backgroundColor: 'white',
-        padding: 20,
-        borderRadius: 10,
-        elevation: 5,
-    },
-    buttonContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginVertical: 10,
-    },
-    button: {
-        width: '48%', // Adjust as needed
-        padding: 10,
-        borderRadius: 5,
-        alignItems: 'center',
-    },
-    deleteButton: {
-        backgroundColor: 'red',
-    },
-    joinButton: {
-        backgroundColor: 'green',
-    },
-    buttonText: {
-        color: 'white',
-        fontWeight: 'bold',
-    },
-    closeButton: {
-        marginTop: 10,
-        padding: 10,
-        backgroundColor: '#c5c5c5',
-        borderRadius: 5,
-        alignItems: 'center',
-    },
-    closeButtonText: {
-        color: 'black',
-    },
-});
-
-export default QueueItem;
+export default QueueList;
