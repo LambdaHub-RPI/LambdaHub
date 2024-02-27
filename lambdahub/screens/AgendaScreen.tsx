@@ -32,32 +32,60 @@ export default class AgendaScreen extends Component<State> {
 
   componentDidMount() {
     // Load items from the dummy JSON file
-    this.loadItemsFromJson();
+    this.loadItemsFromAPI();
   }
 
-  loadItemsFromJson = () => {
-    // Process the imported JSON data and populate the items state
-    const items: AgendaSchedule = {};
+  // loadItemsFromJson = () => {
+  //   // Process the imported JSON data and populate the items state
+  //   const items: AgendaSchedule = {};
     
-    jsonData.forEach((event) => {
-      const time = new Date(event.date).getTime();
-      const strTime = this.timeToString(time);
+  //   jsonData.forEach((event) => {
+  //     const time = new Date(event.date).getTime();
+  //     const strTime = this.timeToString(time);
 
-      if (!items[strTime]) {
-        items[strTime] = [];
-      }
+  //     if (!items[strTime]) {
+  //       items[strTime] = [];
+  //     }
 
-      items[strTime].push({
-        name: event.title,
-        starttime: event.starttime,
-        endtime: event.endtime,
-        description: event.description,
-        height: 100,
-        day: strTime
+  //     items[strTime].push({
+  //       name: event.title,
+  //       starttime: event.starttime,
+  //       endtime: event.endtime,
+  //       description: event.description,
+  //       height: 100,
+  //       day: strTime
+  //     });
+  //   });
+
+  //   this.setState({ items });
+  // };
+
+  loadItemsFromAPI = async () => {
+    
+      const response = await fetch('http://127.0.0.1:8000/event-api/events/');
+      const data = await response.json();
+      const items: AgendaSchedule = {};
+
+      data.forEach((event) => {
+        const time = new Date(event.date).getTime();
+        const strTime = this.timeToString(time);
+
+        if (!items[strTime]) {
+          items[strTime] = [];
+        }
+
+        items[strTime].push({
+          name: event.name,
+          starttime: event.starttime,
+          endtime: event.endtime,
+          description: event.description,
+          height: 100,
+          day: strTime,
+        });
       });
-    });
 
-    this.setState({ items });
+      this.setState({ items });
+    
   };
 
   date = new Date().toJSON();
@@ -73,7 +101,7 @@ export default class AgendaScreen extends Component<State> {
         renderEmptyDate={this.renderEmptyDate}
         rowHasChanged={this.rowHasChanged}
         showClosingKnob={true}
-        // markingType={'period'}
+        //markingType={'multi-dot'}
         // markedDates={{
         //    '2017-05-08': {textColor: '#43515c'},
         //    '2017-05-09': {textColor: '#43515c'},
@@ -82,7 +110,7 @@ export default class AgendaScreen extends Component<State> {
         //    '2017-05-22': {endingDay: true, color: 'gray'},
         //    '2017-05-24': {startingDay: true, color: 'gray'},
         //    '2017-05-25': {color: 'gray'},
-        //    '2017-05-26': {endingDay: true, color: 'gray'}}}
+        //  '2022-02-19': {dots: [vacation], selected: true, selectedColor: 'red'}}}
         // monthFormat={'yyyy'}
         // theme={{calendarBackground: 'red', agendaKnobColor: 'green'}}
         // renderDay={this.renderDay}
@@ -95,6 +123,7 @@ export default class AgendaScreen extends Component<State> {
 
   loadItems = (day: DateData) => {
     const items = this.state.items || {};
+    console.log(items);
 
     setTimeout(() => {
       for (let i = -15; i < 200; i++) {
@@ -113,7 +142,8 @@ export default class AgendaScreen extends Component<State> {
       this.setState({
         items: newItems
       });
-    }, 1000);
+    }, 4000);
+    console.log(items);
   };
 
   renderDay = (day) => {

@@ -68,6 +68,13 @@
       "starttime": "19:00",
       "endtime": "21:00",
       "description": "Event description"
+    },
+    {
+      "title": "Event 11",
+      "date": "2024-02-10",
+      "starttime": "9:00",
+      "endtime": "12:00",
+      "description": "Event description"
     }
   ]
   
