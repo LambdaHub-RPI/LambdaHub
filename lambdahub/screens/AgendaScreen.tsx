@@ -31,37 +31,10 @@ export default class AgendaScreen extends Component<State> {
    //};
 
   componentDidMount() {
-    // Load items from the dummy JSON file
     this.loadItemsFromAPI();
   }
 
-  // loadItemsFromJson = () => {
-  //   // Process the imported JSON data and populate the items state
-  //   const items: AgendaSchedule = {};
-    
-  //   jsonData.forEach((event) => {
-  //     const time = new Date(event.date).getTime();
-  //     const strTime = this.timeToString(time);
-
-  //     if (!items[strTime]) {
-  //       items[strTime] = [];
-  //     }
-
-  //     items[strTime].push({
-  //       name: event.title,
-  //       starttime: event.starttime,
-  //       endtime: event.endtime,
-  //       description: event.description,
-  //       height: 100,
-  //       day: strTime
-  //     });
-  //   });
-
-  //   this.setState({ items });
-  // };
-
   loadItemsFromAPI = async () => {
-    
       const response = await fetch('http://127.0.0.1:8000/event-api/events/');
       const data = await response.json();
       const items: AgendaSchedule = {};
@@ -83,9 +56,7 @@ export default class AgendaScreen extends Component<State> {
           day: strTime,
         });
       });
-
       this.setState({ items });
-    
   };
 
   date = new Date().toJSON();
@@ -93,12 +64,11 @@ export default class AgendaScreen extends Component<State> {
   render() {
     return (
       <Agenda
-        
         items={this.state.items}
         loadItemsForMonth={this.loadItems}
         selected={this.date.split('T')[0]}
         renderItem={this.renderItem}
-        renderEmptyDate={this.renderEmptyDate}
+        //renderEmptyDate={this.renderEmptyDate}
         rowHasChanged={this.rowHasChanged}
         showClosingKnob={true}
         //markingType={'multi-dot'}
@@ -121,20 +91,19 @@ export default class AgendaScreen extends Component<State> {
     );
   }
 
-  loadItems = (day: DateData) => {
+  loadItems = async (day: DateData) => {
+    await this.loadItemsFromAPI(); // Wait for the async function to complete
     const items = this.state.items || {};
-    console.log(items);
-
+  
     setTimeout(() => {
       for (let i = -15; i < 200; i++) {
         const time = day.timestamp + i * 24 * 60 * 60 * 1000;
         const strTime = this.timeToString(time);
-
+  
         if (!items[strTime]) {
           items[strTime] = [];
         }
       }
-      
       const newItems: AgendaSchedule = {};
       Object.keys(items).forEach(key => {
         newItems[key] = items[key];
@@ -142,8 +111,7 @@ export default class AgendaScreen extends Component<State> {
       this.setState({
         items: newItems
       });
-    }, 4000);
-    console.log(items);
+    }, 1000);
   };
 
   renderDay = (day) => {
@@ -157,6 +125,9 @@ export default class AgendaScreen extends Component<State> {
     const fontSize = isFirst ? 16 : 14;
     const color = isFirst ? 'black' : '#43515c';
 
+    const startTime = this.formatTime(reservation.starttime);
+    const endTime = this.formatTime(reservation.endtime);
+
     return (
       <TouchableOpacity
       style={[styles.item, {height: reservation.height}]}
@@ -164,17 +135,28 @@ export default class AgendaScreen extends Component<State> {
     >
       <View style={styles.itemContent}>
         <Text style={styles.title}>{reservation.name}</Text>
-        <Text style={styles.time}>{reservation.starttime} - {reservation.endtime}</Text>
+        <Text style={styles.time}>{startTime} - {endTime}</Text>
         <Text style={styles.description}>{reservation.description}</Text>
       </View>
     </TouchableOpacity>
     );
   };
+  
+  formatTime = (timeString: string) => {
+    const [hours, minutes] = timeString.split(':').map(Number);
+    const period = hours < 12 ? 'AM' : 'PM';
+    const formattedHours = hours % 12 || 12; // Convert hours to 12-hour format
+
+  return (
+    `${formattedHours}:${minutes.toString().padStart(2, '0')}${period}`);
+  };
 
   showAgendaItemDetails = (reservation: AgendaEntry) => {
+    const startTime = this.formatTime(reservation.starttime);
+    const endTime = this.formatTime(reservation.endtime);
     Alert.alert(
       reservation.name,
-      `Start Time: ${reservation.starttime}\nEnd Time: ${reservation.endtime}\nDescription: ${reservation.description}`
+      `Start Time: ${startTime}\nEnd Time: ${endTime}\nDescription: ${reservation.description}`
     );
   };
 
