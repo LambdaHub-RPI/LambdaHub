@@ -6,7 +6,7 @@ import Modal from 'react-native-modal';
 const Stack = createStackNavigator();
 
 function AnnouncementScreenContent({ navigation }) {
-  const [input, setInput] = useState(['']);
+  const [input, setInput] = useState([]);
   const [isModalVisible, setModalVisible] = useState(false);
   const [modalInput, setModalInput] = useState({
     author: '',
@@ -25,6 +25,7 @@ function AnnouncementScreenContent({ navigation }) {
     setInput(newInputs);
   };
 
+  /*   Not needed anymore because modal will automatically enter info
   const handleInputChange = (text, index) => {
     setInput((prevInput) => {
       const newInputs = [...prevInput];
@@ -32,6 +33,7 @@ function AnnouncementScreenContent({ navigation }) {
       return newInputs;
     });
   };
+  Keeping just incase for future */
 
   const closeModal = () => {
     setModalVisible(false);
@@ -42,61 +44,57 @@ function AnnouncementScreenContent({ navigation }) {
   };
 
   const handleModalSubmit = () => {
-    // Handle modal form submission logic here
-
-    // Reset modal input state
+    const newAnnouncement = {
+      author: modalInput.author,
+      title: modalInput.title,
+      date: modalInput.date,
+      announcement: modalInput.announcement,
+    };
+  
+    setInput(prevInput => [...prevInput, newAnnouncement]);
+  
     setModalInput({
       author: '',
       title: '',
       date: '',
       announcement: '',
     });
-
-    // Close the modal after submission
+  
     setModalVisible(false);
   };
+  
+  
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Button title="Create New Announcement" onPress={handleAdd} />
       <View style={styles.announcementContainer}>
-        <View>
-          {input.map((index) => (
-            <View key={index} style={styles.titleCont}>
-              <Text style={styles.titleText}>{"Title:"}</Text>
+        {input.map((announcement, index) => (
+          <View key={`${announcement.title}-${announcement.author}-${index}`} style={styles.announcementItem}>
+            <View style={styles.titleCont}>
+              <Text style={styles.titleText}>Title: {announcement.title}</Text>
             </View>
-          ))}
-        </View>
-        <View>
-          {input.map((input, index) => (
-            <View key={index} style={styles.inputContainer}>
+            <View style={styles.inputContainer}>
               <TextInput
                 multiline
                 numberOfLines={4}
-                value={input}
-                onChangeText={(text) => handleInputChange(text, index)}
+                value={announcement.announcement}
+                editable={false} 
                 style={styles.input}
               />
             </View>
-          ))}
-        </View>
-        <View>
-          {input.map((index) => (
-            <View key={index} style={styles.titleCont}>
-              <Text style={styles.titleText}>{"Author:"}</Text>
-              <Text style={styles.dateText}>{"Date:"}</Text>
+            <View style={styles.titleCont}>
+              <Text style={styles.titleText}>Author: {announcement.author}</Text>
+              <Text style={styles.dateText}>Date: {announcement.date}</Text>
             </View>
-          ))}
-        </View>
-        <View>
-          {input.map((index) => (
-            <View key={index} style={styles.buttonContainer}>
+            <View style={styles.buttonContainer}>
               <Button title="Delete" onPress={() => handleRemove(index)} />
-              <Button title="Expand" onPress={() => handleRemove(index)} />
+              <Button title="Expand" onPress={() => handleExpand(index)} />
             </View>
-          ))}
-        </View>
+          </View>
+        ))}
       </View>
+
       <Modal isVisible={isModalVisible} onBackdropPress={closeModal}>
         <View style={styles.modalContainer}>
           <Text>Author:</Text>
@@ -156,8 +154,6 @@ const styles = StyleSheet.create({
   },
 
   announcementContainer: {
-    borderColor: 'black',
-    borderWidth: 1,
     height: 160,
     width: 375
   },
@@ -187,8 +183,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     height: 20,
     width: 375,
-    borderColor: 'black',
-    borderWidth: 1,
     paddingHorizontal: 5,
   },
 
