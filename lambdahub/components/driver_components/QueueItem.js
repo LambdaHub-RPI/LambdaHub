@@ -1,38 +1,35 @@
-import React, { useState } from 'react';
-import { StyleSheet, Animated, PanResponder, Text, View } from 'react-native';
+import React, { useState, useMemo } from 'react';
+import { StyleSheet, Animated, PanResponder, Text, View, Alert } from 'react-native';
 
-const SlideableButton = ({ text, onDelete }) => {
+const SlideableButton = ({ text, onDelete, onLongPress }) => {
     const pan = useState(new Animated.ValueXY())[0];
 
-    const panResponder = useState(
-        PanResponder.create({
-            onStartShouldSetPanResponder: () => true,
-            onPanResponderMove: (_, gesture) => {
-                // Limit movement to the left
-                if (gesture.dx < -50) {
-                    pan.setValue({ x: gesture.dx, y: 0 });
-                }
-            },
-            onPanResponderRelease: (_, gesture) => {
-                if (gesture.dx < -150) {
-                    // If swiped far enough to the left, trigger onDelete
-                    Animated.timing(pan, {
-                        toValue: { x: -500, y: 0 },
-                        duration: 200,
-                        useNativeDriver: false,
-                    }).start(() => {
-                        onDelete();
-                    });
-                } else {
-                    // If not swiped far enough, reset position
-                    Animated.spring(pan, {
-                        toValue: { x: 0, y: 0 },
-                        useNativeDriver: false,
-                    }).start();
-                }
-            },
-        })
-    )[0];
+    // Prepare animated event and pan responder with added long-press logic
+    const panResponder = useMemo(() => PanResponder.create({
+        onStartShouldSetPanResponder: () => true,
+        onPanResponderMove: Animated.event([
+            null,
+            { dx: pan.x }
+        ], {
+            useNativeDriver: false,
+        }),
+        onPanResponderRelease: (_, gesture) => {
+            if (gesture.dx < -150) {
+                Animated.timing(pan, {
+                    toValue: { x: -500, y: 0 },
+                    duration: 200,
+                    useNativeDriver: true,
+                }).start(onDelete);
+            } else {
+                Animated.spring(pan, {
+                    toValue: { x: 0, y: 0 },
+                    friction: 5,
+                    useNativeDriver: true,
+                }).start();
+            }
+        },
+        onLongPress: onLongPress, // Handle long press
+    }), [pan, onDelete, onLongPress]);
 
     return (
         <Animated.View
@@ -40,6 +37,11 @@ const SlideableButton = ({ text, onDelete }) => {
                 styles.slideableButton,
                 {
                     transform: [{ translateX: pan.x }],
+                    opacity: pan.x.interpolate({
+                        inputRange: [-200, 0],
+                        outputRange: [0.5, 1],
+                        extrapolate: 'clamp',
+                    }),
                 },
             ]}
             {...panResponder.panHandlers}
@@ -49,7 +51,7 @@ const SlideableButton = ({ text, onDelete }) => {
     );
 };
 
-const QueueItem = ({ id, requestors_name, fromWhere, toWhere, numPassengers, onDelete }) => {
+const QueueItem = ({ id, requestors_name, fromWhere, toWhere, numPassengers, onDelete, onAttemptMerge }) => {
     const [deleted, setDeleted] = useState(false);
 
     const handleDelete = () => {
@@ -57,13 +59,19 @@ const QueueItem = ({ id, requestors_name, fromWhere, toWhere, numPassengers, onD
         setDeleted(true); // Set the "Deleted" flag to true
     };
 
+    const handleLongPress = () => {
+        onAttemptMerge(id, numPassengers); // Parent handles logic to determine if merge is possible
+    };
+
     return !deleted ? (
         <SlideableButton
             text={`${requestors_name} with ${numPassengers} passengers\n${fromWhere} to ${toWhere}`}
             onDelete={handleDelete}
+            onLongPress={handleLongPress}
         />
     ) : null;
 };
+
 
 const styles = StyleSheet.create({
     slideableButton: {
@@ -88,5 +96,6 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
 });
+
 
 export default QueueItem;
