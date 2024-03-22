@@ -7,16 +7,18 @@ const Stack = createStackNavigator();
 
 function AnnouncementScreenContent({ navigation }) {
   const [input, setInput] = useState([]);
-  const [isModalVisible, setModalVisible] = useState(false);
+  const [isCreateModalVisible, setCreateModalVisible] = useState(false);
+  const [isExpandModalVisible, setExpandModalVisible] = useState(false);
   const [modalInput, setModalInput] = useState({
     author: '',
     title: '',
     date: '',
     announcement: '',
   });
+  const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
 
   const handleAdd = () => {
-    setModalVisible(true);
+    setCreateModalVisible(true);
   };
 
   const handleRemove = (index) => {
@@ -25,18 +27,9 @@ function AnnouncementScreenContent({ navigation }) {
     setInput(newInputs);
   };
 
-  /*   Not needed anymore because modal will automatically enter info
-  const handleInputChange = (text, index) => {
-    setInput((prevInput) => {
-      const newInputs = [...prevInput];
-      newInputs[index] = text;
-      return newInputs;
-    });
-  };
-  Keeping just incase for future */
-
   const closeModal = () => {
-    setModalVisible(false);
+    setCreateModalVisible(false);
+    setExpandModalVisible(false);
   };
 
   const handleModalInputChange = (key, text) => {
@@ -60,11 +53,14 @@ function AnnouncementScreenContent({ navigation }) {
       announcement: '',
     });
   
-    setModalVisible(false);
+    setCreateModalVisible(false);
+  };
+
+  const handleExpand = (index) => {
+    setSelectedAnnouncement(input[index]);
+    setExpandModalVisible(true);
   };
   
-  
-
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Button title="Create New Announcement" onPress={handleAdd} />
@@ -95,8 +91,18 @@ function AnnouncementScreenContent({ navigation }) {
         ))}
       </View>
 
-      <Modal isVisible={isModalVisible} onBackdropPress={closeModal}>
+      <Modal isVisible={isExpandModalVisible} onBackdropPress={closeModal}>
         <View style={styles.modalContainer}>
+          <Text style={styles.titleText}>Title: {selectedAnnouncement?.title}</Text>
+          <Text style={styles.authorText}>Author: {selectedAnnouncement?.author}</Text>
+          <Text style={styles.dateText}>Date: {selectedAnnouncement?.date}</Text>
+          <Text style={styles.announcementText}>{selectedAnnouncement?.announcement}</Text>
+          <Button title="Close" onPress={closeModal} />
+        </View>
+      </Modal>
+
+      <Modal isVisible={isCreateModalVisible} onBackdropPress={closeModal}>
+        <ScrollView contentContainerStyle={styles.modalContainer}>
           <Text>Author:</Text>
           <TextInput
             placeholder="Enter author"
@@ -125,82 +131,96 @@ function AnnouncementScreenContent({ navigation }) {
             numberOfLines={4}
             value={modalInput.announcement}
             onChangeText={(text) => handleModalInputChange('announcement', text)}
-            style={styles.modalInput}
+            style={[styles.modalInput, styles.modalTextArea]}
           />
           <Button title="Submit" onPress={handleModalSubmit} />
           <Button title="Close Modal" onPress={closeModal} />
-        </View>
+        </ScrollView>
       </Modal>
+
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 5
+    backgroundColor: 'white',
+    padding: 20,
+    flexGrow: 1,
   },
 
   inputContainer: {
     flexDirection: 'column',
-    borderColor: 'black',
-    paddingLeft: 5,
-    paddingRight: 3,
-
-    width: "95%",
-    height: 85
+    borderColor: '#CCCCCC',
+    borderRadius: 20,
+    paddingRight: 15,
+    paddingBottom: 10,
+    marginHorizontal: 10,
+    shadowColor: '#000',
+    width: '100%',
   },
 
   announcementContainer: {
-    height: 160,
-    width: 375
+    flex: 1,
+    width: '100%',
   },
 
   buttonContainer: {
     flexDirection: 'row',
-    justifyContent: 'flex-end',
-    width: 373,
-    paddingRight: 5,
-    height: 40
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 10,
   },
 
   input: {
     flex: 1,
-    alignItems: 'center',
-    width: 360,
-    height: '100%',
-    borderColor: 'black',
+    width: '100%',
+    height: 60,
+    borderColor: '#CCCCCC',
     borderWidth: 1,
-    marginRight: 5,
-    paddingLeft: 5,
+    borderRadius: 5,
+    padding: 10,
   },
 
   titleCont: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    height: 20,
-    width: 375,
-    paddingHorizontal: 5,
+    marginBottom: 5,
   },
 
   titleText: {
-    flex: 1,
+    fontWeight: 'bold',
   },
 
   dateText: {
-    position: 'absolute', 
-    left: 190,
+    color: '#666666',
   },
 
   modalContainer: {
-    backgroundColor: 'white',
+    backgroundColor: '#FFFFFF',
     padding: 20,
     borderRadius: 10,
-    alignItems: 'center',
-    color: 'black',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+
+  modalInput: {
+    borderColor: '#CCCCCC',
+    borderWidth: 1,
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 10,
+  },
+
+  modalTextArea: {
+    height: 200, 
   },
 });
 
