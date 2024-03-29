@@ -1,73 +1,131 @@
-import React, { useState } from 'react';
-import { SafeAreaView, View, Text, StyleSheet, Button, Modal, TextInput, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import {
+  SafeAreaView,
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Modal,
+  TextInput,
+} from 'react-native';
 import QueueList from '../components/driver_components/QueueList';
-import { DUMMY_DATA } from '../data/dummy';
 
 const QueueScreen = () => {
+  const [rides, setRides] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
-  const [newRide, setNewRide] = useState({ requestors_name: '', fromWhere: '', toWhere: '', numPassengers: '' });
-  const [localDummyData, setLocalDummyData] = useState([...DUMMY_DATA]);
+  const [newRide, setNewRide] = useState({
+    name: '',
+    startlocation: '',
+    endlocation: '',
+    numPassengers: '',
+  });
 
-  const handleNewRide = () => {
-    setModalVisible(true);
+  useEffect(() => {
+    fetchRides();
+  }, []);
+
+  const fetchRides = async () => {
+    try {
+      const response = await fetch('http://127.0.0.1:8000/ride-api/rides/');
+      const data = await response.json();
+      setRides(data);
+    } catch (error) {
+      console.error('Failed to fetch rides:', error);
+    }
   };
 
-  const handleCloseModal = () => {
+  // Placeholder for adding a ride (you'll need to implement this)
+  const addRide = async () => {
+    // Close the modal
     setModalVisible(false);
+  
+    // Prepare the data for the new ride
+    const rideData = {
+      name: newRide.name,
+      startlocation: newRide.startlocation,
+      endlocation: newRide.endlocation,
+      numPassengers: parseInt(newRide.numPassengers, 10), // Ensure numPassengers is an integer
+    };
+  
+    try {
+      // Make the API call to add the new ride
+      const response = await fetch('http://127.0.0.1:8000/ride-api/rides/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(rideData),
+      });
+  
+      if (!response.ok) {
+        throw new Error(`API call failed with status: ${response.status}`);
+      }
+  
+      // After a successful addition, clear the input fields
+      setNewRide({ name: '', startlocation: '', endlocation: '', numPassengers: '' });
+      
+      // Fetch the updated list of rides
+      fetchRides();
+    } catch (error) {
+      console.error('Failed to add ride:', error);
+      // Implement additional error handling if needed
+    }
   };
-
-  const handleSubmit = () => {
-    const id = localDummyData.length;
-    const updatedData = [...localDummyData, { id, ...newRide, deleted: false }];
-    setLocalDummyData(updatedData);
-    setModalVisible(false);
-    setNewRide({ requestors_name: '', fromWhere: '', toWhere: '', numPassengers: '' });
-  };
+  
+  
 
   return (
     <SafeAreaView style={styles.container}>
-      <QueueList data={localDummyData} setData={setLocalDummyData} />
-      <TouchableOpacity style={styles.addButton} onPress={handleNewRide}>
-        <Text style={styles.buttonText}>Make a New Ride</Text>
+      <QueueList data={rides} />
+      <TouchableOpacity
+        style={styles.addButton}
+        onPress={() => setModalVisible(true)}
+      >
+        <Text style={styles.addButtonText}>Add New Ride</Text>
       </TouchableOpacity>
-      <Modal visible={modalVisible} transparent={true} animationType="slide">
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <TouchableOpacity style={styles.closeButton} onPress={handleCloseModal}>
-              <Text style={styles.closeButtonText}>Close</Text>
-            </TouchableOpacity>
-            <Text style={styles.modalTitle}>New Ride Details</Text>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(!modalVisible);
+        }}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalText}>New Ride Details</Text>
+            {/* Input fields for the new ride details */}
             <TextInput
               style={styles.input}
-              placeholder="Your Name"
-              placeholderTextColor="rgba(0, 128, 0, 0.5)"
-              onChangeText={text => setNewRide(prevState => ({ ...prevState, requestors_name: text }))}
-              value={newRide.requestors_name}
+              onChangeText={(text) => setNewRide({ ...newRide, name: text })}
+              value={newRide.name}
+              placeholder="Name"
             />
             <TextInput
               style={styles.input}
-              placeholder="From Where"
-              placeholderTextColor="rgba(0, 128, 0, 0.5)"
-              onChangeText={text => setNewRide(prevState => ({ ...prevState, fromWhere: text }))}
-              value={newRide.fromWhere}
+              onChangeText={(text) => setNewRide({ ...newRide, startlocation: text })}
+              value={newRide.startlocation}
+              placeholder="Start Location"
             />
             <TextInput
               style={styles.input}
-              placeholder="To Where"
-              placeholderTextColor="rgba(0, 128, 0, 0.5)"
-              onChangeText={text => setNewRide(prevState => ({ ...prevState, toWhere: text }))}
-              value={newRide.toWhere}
+              onChangeText={(text) => setNewRide({ ...newRide, endlocation: text })}
+              value={newRide.endlocation}
+              placeholder="End Location"
             />
             <TextInput
               style={styles.input}
-              placeholder="Number of Passengers"
-              placeholderTextColor="rgba(0, 128, 0, 0.5)"
-              onChangeText={text => setNewRide(prevState => ({ ...prevState, numPassengers: text }))}
+              onChangeText={(text) => setNewRide({ ...newRide, numPassengers: text })}
               value={newRide.numPassengers}
+              placeholder="Number of Passengers"
               keyboardType="numeric"
             />
-            <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-              <Text style={styles.buttonText}>Submit</Text>
+            <TouchableOpacity
+              style={[styles.button, styles.buttonClose]}
+              onPress={addRide}
+            >
+              <Text style={styles.textStyle}>Add Ride</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -80,66 +138,66 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   addButton: {
-    backgroundColor: '#007bff',
-    padding: 15,
-    borderRadius: 10,
-    marginTop: 20,
+    backgroundColor: '#2196F3',
+    padding: 10,
+    borderRadius: 20,
+    margin: 20,
   },
-  buttonText: {
+  addButtonText: {
     color: '#fff',
     fontSize: 18,
-    fontWeight: 'bold',
     textAlign: 'center',
   },
-  modalContainer: {
+  centeredView: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    marginTop: 22,
   },
-  modalContent: {
-    backgroundColor: '#fff',
-    padding: 20,
-    borderRadius: 10,
-    width: '80%',
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
     alignItems: 'center',
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
-    color: '#000',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
   },
   input: {
+    width: 200,
     height: 40,
-    width: '100%',
-    borderColor: 'gray',
+    marginBottom: 12,
     borderWidth: 1,
-    marginBottom: 10,
-    paddingHorizontal: 10,
-    color: '#000',
+    padding: 10,
+    borderRadius: 5,
   },
-  submitButton: {
-    backgroundColor: '#007bff',
-    padding: 15,
-    borderRadius: 10,
-    marginTop: 20,
+  button: {
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2,
+    marginTop: 10,
   },
-  closeButton: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
+  buttonClose: {
+    backgroundColor: "#2196F3",
   },
-  closeButtonText: {
-    color: '#007bff',
-    fontSize: 16,
-    fontWeight: 'bold',
+  textStyle: {
+    color: "white",
+    fontWeight: "bold",
+    textAlign: "center"
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: "center"
   },
 });
 
 export default QueueScreen;
+

@@ -1,0 +1,39 @@
+// QueueScreen.js
+import React, { useState, useEffect } from 'react';
+import { SafeAreaView, View, Text, StyleSheet, Button, Modal, TextInput, TouchableOpacity } from 'react-native';
+import QueueList from '../components/driver_components/QueueList';
+
+const QueueScreen = () => {
+  const [rides, setRides] = useState([]);
+
+  useEffect(() => {
+    fetchRides();
+  }, []);
+
+  const fetchRides = async () => {
+    try {
+      const response = await fetch('http://127.0.0.1:8000/ride-api/rides/');
+      const data = await response.json();
+      setRides(data);
+    } catch (error) {
+      console.error('Failed to fetch rides:', error);
+    }
+  };
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <QueueList data={rides} />
+    </SafeAreaView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});
+
+export default QueueScreen;
