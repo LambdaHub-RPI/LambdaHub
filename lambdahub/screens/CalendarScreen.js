@@ -1,47 +1,64 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import AgendaScreen from "./AgendaScreen";
 import AddEventScreen from "./AddEventScreen";
-import { createStackNavigator } from '@react-navigation/stack';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 
-const Stack = createStackNavigator();
 
-export default function CalendarScreen({ navigation }) {
+const Tab = createBottomTabNavigator();
+
+export default function CalendarScreen() {
   return (
-    <Stack.Navigator>
-      <Stack.Screen
+    <Tab.Navigator
+      initialRouteName="Agenda"
+      screenOptions={{
+        tabBarActiveTintColor: '#21B3E1',
+      }}
+    >
+      <Tab.Screen
         name="Agenda"
         component={AgendaScreen}
         options={{
-          header: ({ navigation }) => (
-            <View style={styles.header}>
-              <TouchableOpacity
-                style={styles.addButton}
-                onPress={() => navigation.navigate('AddEvent')}
-              >
-                <Text style={styles.addButtonText}>Add Event</Text>
-              </TouchableOpacity>
-            </View>
+          tabBarLabel: 'Calendar',
+          headerShown: false, 
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="calendar" color={color} size={size} />
+          ),// Set the label for the "Agenda" tab
+        }}
+      />
+      <Tab.Screen
+        name="AddEvent"
+        component={AddEventScreen}
+        options={{
+          tabBarLabel: "Add Event",
+          headerShown: false, 
+          tabBarIcon: ({ color, size }) => (
+            <FontAwesome6 name="calendar-plus" color={color} size={size} />
           ),
         }}
       />
-      <Stack.Screen name="AddEvent" component={AddEventScreen} />
-    </Stack.Navigator>
+    </Tab.Navigator>
   );
 }
-  
+
 const styles = StyleSheet.create({
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 10,
+  tabBar: {
+    borderTopWidth: 1,
+    borderTopColor: 'lightgray',
+    backgroundColor: 'white',
+    paddingBottom: 10,
+  },
+  tabLabel: {
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   addButton: {
-    paddingHorizontal: 20, // Adjust padding horizontally
-    paddingVertical: 10,   // Adjust padding vertically
-    borderRadius: 20,      // Adjust border radius to make it more rounded
-    backgroundColor: 'lightgray', // Add a background color for better visibility
+    flex: 1,
+    paddingTop: 15,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   addButtonText: {
     fontSize: 18,
