@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput, Button } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TextInput, Button, TouchableOpacity} from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import Modal from 'react-native-modal';
 
@@ -46,10 +46,17 @@ function AnnouncementScreenContent({ navigation }) {
   
     setInput(prevInput => [...prevInput, newAnnouncement]);
   
+    const formatDate = (date) => {
+      const day = date.getDate().toString().padStart(2, '0');
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+      const year = date.getFullYear();
+      return `${month}/${day}/${year}`;
+    };
+
     setModalInput({
       author: '',
       title: '',
-      date: '',
+      date: formatDate(new Date()),
       announcement: '',
     });
   
@@ -60,6 +67,12 @@ function AnnouncementScreenContent({ navigation }) {
     setSelectedAnnouncement(input[index]);
     setExpandModalVisible(true);
   };
+
+  const CustomButton = ({ title, onPress, style }) => (
+    <TouchableOpacity onPress={onPress} style={[styles.customButton, style]}>
+      <Text style={styles.customButtonText}>{title}</Text>
+    </TouchableOpacity>
+  );
   
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -67,6 +80,7 @@ function AnnouncementScreenContent({ navigation }) {
       <View style={styles.announcementContainer}>
         {input.map((announcement, index) => (
           <View key={`${announcement.title}-${announcement.author}-${index}`} style={styles.announcementItem}>
+          <View style={styles.innerAnnouncementItem}>
             <View style={styles.titleCont}>
               <Text style={styles.titleText}>Title: {announcement.title}</Text>
             </View>
@@ -84,15 +98,16 @@ function AnnouncementScreenContent({ navigation }) {
               <Text style={styles.dateText}>Date: {announcement.date}</Text>
             </View>
             <View style={styles.buttonContainer}>
-              <Button title="Delete" onPress={() => handleRemove(index)} />
-              <Button title="Expand" onPress={() => handleExpand(index)} />
+              <CustomButton title="Delete" onPress={() => handleRemove(index)} />
+              <CustomButton title="Expand" onPress={() => handleExpand(index)}/>
             </View>
           </View>
+        </View>        
         ))}
       </View>
 
       <Modal isVisible={isExpandModalVisible} onBackdropPress={closeModal}>
-        <View style={styles.modalContainer}>
+        <View style={styles.modalContainerExpand}>
           <Text style={styles.titleText}>Title: {selectedAnnouncement?.title}</Text>
           <Text style={styles.authorText}>Author: {selectedAnnouncement?.author}</Text>
           <Text style={styles.dateText}>Date: {selectedAnnouncement?.date}</Text>
@@ -102,19 +117,19 @@ function AnnouncementScreenContent({ navigation }) {
       </Modal>
 
       <Modal isVisible={isCreateModalVisible} onBackdropPress={closeModal}>
-        <ScrollView contentContainerStyle={styles.modalContainer}>
-          <Text>Author:</Text>
-          <TextInput
-            placeholder="Enter author"
-            value={modalInput.author}
-            onChangeText={(text) => handleModalInputChange('author', text)}
-            style={styles.modalInput}
-          />
+        <ScrollView contentContainerStyle={styles.modalContainerCreate}>
           <Text>Title:</Text>
           <TextInput
             placeholder="Enter title"
             value={modalInput.title}
             onChangeText={(text) => handleModalInputChange('title', text)}
+            style={styles.modalInput}
+          />
+          <Text>Author:</Text>
+          <TextInput
+            placeholder="Enter author"
+            value={modalInput.author}
+            onChangeText={(text) => handleModalInputChange('author', text)}
             style={styles.modalInput}
           />
           <Text>Date:</Text>
@@ -145,8 +160,24 @@ function AnnouncementScreenContent({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: 'white',
-    padding: 20,
+    paddingTop: 7,
+    paddingLeft: 15,
+    paddingRight: 15,
+    paddingBottom: 25,
     flexGrow: 1,
+  },
+  
+  announcementItem: {
+    borderColor: '#CCCCCC',
+    borderWidth: 1,
+    borderRadius: 10,
+    marginBottom: 10,
+  },
+
+  innerAnnouncementItem: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 8,
+    padding: 10,
   },
 
   inputContainer: {
@@ -155,9 +186,8 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     paddingRight: 15,
     paddingBottom: 10,
-    marginHorizontal: 10,
     shadowColor: '#000',
-    width: '100%',
+    width: 355,
   },
 
   announcementContainer: {
@@ -168,8 +198,7 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: 10,
+    width: 350,
   },
 
   input: {
@@ -179,7 +208,9 @@ const styles = StyleSheet.create({
     borderColor: '#CCCCCC',
     borderWidth: 1,
     borderRadius: 5,
-    padding: 10,
+    paddingLeft: 5,
+    paddingRight: 5,
+    paddingTop: 1,
   },
 
   titleCont: {
@@ -194,12 +225,40 @@ const styles = StyleSheet.create({
   },
 
   dateText: {
-    color: '#666666',
+    color: 'black',
   },
 
-  modalContainer: {
+  customButton: {
+    backgroundColor: '#093D20', 
+    padding: 8,
+    borderRadius: 5,
+    marginRight: 10,
+  },
+  
+  customButtonText: {
+    color: 'white', 
+    fontSize: 14, 
+    fontWeight: 'bold',
+  },
+
+  modalContainerCreate: {
     backgroundColor: '#FFFFFF',
-    padding: 20,
+    padding: 15,
+    borderRadius: 10,
+    marginTop: 100,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+
+  modalContainerExpand: {
+    backgroundColor: '#FFFFFF',
+    padding: 15,
     borderRadius: 10,
     shadowColor: '#000',
     shadowOffset: {
@@ -213,6 +272,7 @@ const styles = StyleSheet.create({
 
   modalInput: {
     borderColor: '#CCCCCC',
+    color: 'black',
     borderWidth: 1,
     borderRadius: 5,
     padding: 10,
@@ -227,7 +287,7 @@ const styles = StyleSheet.create({
 export default function AnnouncementScreen() {
   return (
     <Stack.Navigator initialRouteName="AnnouncementScreenContent" screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Announcements" component={AnnouncementScreenContent} />
+      <Stack.Screen name="AnnouncementsScreenContent" component={AnnouncementScreenContent} />
     </Stack.Navigator>
   );
 }
