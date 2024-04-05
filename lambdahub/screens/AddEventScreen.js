@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
 
 export default function AddEventScreen({ navigation }) {
   const [name, setName] = useState('');
@@ -18,7 +19,7 @@ export default function AddEventScreen({ navigation }) {
         endtime: endTime,
       };
   
-      const response = await fetch('http://127.0.0.1:8000/event-api/events/', {
+      const response = await fetch('http://129.161.214.195:8000/event-api/events/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -39,7 +40,8 @@ export default function AddEventScreen({ navigation }) {
   };
 
   return (
-    <View style={styles.container}>
+  
+      <ScrollView style={styles.container}>
       <Text style={styles.label}>Event Name:</Text>
       <TextInput
         style={styles.input}
@@ -77,7 +79,7 @@ export default function AddEventScreen({ navigation }) {
         placeholder="HH:MM"
       />
       <Button title="Add Event" onPress={handleAddEvent} />
-    </View>
+      </ScrollView>
   );
 }
 

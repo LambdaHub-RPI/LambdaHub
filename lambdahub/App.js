@@ -1,12 +1,10 @@
 import 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
-import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView } from "react-native";
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import AnnouncementScreen from './screens/AnnouncementScreen';
 import CalendarScreen from './screens/CalendarScreen';
 import DriverScreen from './screens/DriverScreen';
 import HomeScreen from './screens/HomeScreen';
-import AddEventScreen from './screens/AddEventScreen';
 
 
 const Drawer = createDrawerNavigator();
