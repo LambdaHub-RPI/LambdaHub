@@ -35,7 +35,7 @@ export default class AgendaScreen extends Component<State> {
 
   loadItemsFromAPI = async () => {
     try{
-      const response = await fetch('http://129.161.214.195:8000/event-api/events/');
+      const response = await fetch('http://129.161.214.228:8000/event-api/events/');
       const data = await response.json();
       const items: AgendaSchedule = {};
 
@@ -87,7 +87,7 @@ export default class AgendaScreen extends Component<State> {
         //  '2022-02-19': {dots: [vacation], selected: true, selectedColor: 'red'}}}
         // monthFormat={'yyyy'}
         // theme={{calendarBackground: 'red', agendaKnobColor: 'green'}}
-        // renderDay={this.renderDay}
+         renderDay={this.renderDay}
         // hideExtraDays={false}
         // showOnlySelectedDayItems
         // reservationsKeyExtractor={this.reservationsKeyExtractor}
@@ -96,8 +96,9 @@ export default class AgendaScreen extends Component<State> {
   }
 
   loadItems = async (day: DateData) => {
+    await this.loadItemsFromAPI(); // Wait for the async function to complete
     const items = this.state.items || {};
-    await this.loadItemsFromAPI();
+
     for (let i = -15; i < 200; i++) {
       const time = day.timestamp + i * 24 * 60 * 60 * 1000;
       const strTime = this.timeToString(time);
@@ -106,14 +107,13 @@ export default class AgendaScreen extends Component<State> {
         items[strTime] = [];
       }
     }
-     // Wait for the async function to complete
-
     const newItems: AgendaSchedule = {};
     Object.keys(items).forEach(key => {
       newItems[key] = items[key];
     });
   
     setTimeout(() => {
+      
       this.setState({
         items: newItems
       });
@@ -127,85 +127,24 @@ export default class AgendaScreen extends Component<State> {
     return <View style={styles.dayItem}/>;
   };
 
-  editEvent = (reservation: AgendaEntry) => {
-    Alert.prompt(
-      'Edit Event',
-      `Edit event details:`,
-      [
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-        {
-          text: 'Save',
-          onPress: (editedDescription: string) => {
-            const editedDetails: Partial<AgendaEntry> = {
-              description: editedDescription,
-            };
-            this.handleEventEditing(reservation, editedDetails);
-          },
-        },
-      ],
-      'plain-text',
-      reservation.description // Pre-filled input with current description
-    );
-  };
-
-  handleEventEditing = async (reservation: AgendaEntry, editedDetails: Partial<AgendaEntry>) => {
-    // Update the event details in state
-    const updatedItems = { ...this.state.items };
-    const dayEvents = updatedItems[reservation.day];
-    const updatedDayEvents = dayEvents.map((event) => {
-      if (event === reservation) {
-        return { ...event, ...editedDetails };
-      }
-      return event;
-    });
-    updatedItems[reservation.day] = updatedDayEvents;
-    this.setState({ items: updatedItems });
-  
-    // Post the changes to the backend
-    await this.postChangesToBackend(reservation, editedDetails);
-  };
-
-  postChangesToBackend = async (reservation: AgendaEntry, editedDetails: Partial<AgendaEntry>) => {
-    try {
-      const response = await fetch(`http://129.161.214.195:8000/event-api/events/${reservation.name}/`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(editedDetails),
-      });
-      if (!response.ok) {
-        throw new Error('Failed to update event on the server.');
-      }
-      console.log('Event updated successfully!');
-    } catch (error) {
-      console.error('Error updating event:', error);
-      // Handle error gracefully, e.g., display a message to the user
-    }
-  };
-
   renderItem = (reservation: AgendaEntry, isFirst: boolean) => {
+    const fontSize = isFirst ? 16 : 14;
+    const color = isFirst ? 'black' : '#43515c';
+
     const startTime = this.formatTime(reservation.starttime);
     const endTime = this.formatTime(reservation.endtime);
-    // Render other event details
+
     return (
       <TouchableOpacity
-        style={[styles.item, { height: reservation.height }]}
-        onPress={() => this.showAgendaItemDetails(reservation)}
-      >
-        <View style={styles.itemContent}>
-          <Text style={styles.title}>{reservation.name}</Text>
-          <Text style={styles.time}>{startTime} - {endTime}</Text>
-          <Text style={styles.description}>{reservation.description}</Text>
-          {/* Edit button */}
-          <TouchableOpacity onPress={() => this.editEvent(reservation)}>
-            <Text style={styles.editButton}>Edit</Text>
-          </TouchableOpacity>
-        </View>
-      </TouchableOpacity>
+      style={[styles.item, {height: reservation.height}]}
+      onPress={() => this.showAgendaItemDetails(reservation)}
+    >
+      <View style={styles.itemContent}>
+        <Text style={styles.title}>{reservation.name}</Text>
+        <Text style={styles.time}>{startTime} - {endTime}</Text>
+        <Text style={styles.description}>{reservation.description}</Text>
+      </View>
+    </TouchableOpacity>
     );
   };
   
@@ -261,11 +200,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
-  },
-  editButton: {
-    color: 'blue',
-    textDecorationLine: 'underline',
-    marginTop: 5,
   },
   itemContent: {
     flex: 1,
