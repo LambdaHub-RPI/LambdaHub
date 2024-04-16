@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Modal,
   TextInput,
+  Switch, // Importing Switch component
 } from 'react-native';
 import QueueList from '../components/driver_components/QueueList';
 
@@ -18,6 +19,7 @@ const QueueScreen = () => {
     startlocation: '',
     endlocation: '',
     numPassengers: '',
+    isEmergency: false,
   });
 
   useEffect(() => {
@@ -34,21 +36,18 @@ const QueueScreen = () => {
     }
   };
 
-  // Placeholder for adding a ride (you'll need to implement this)
   const addRide = async () => {
-    // Close the modal
     setModalVisible(false);
-  
-    // Prepare the data for the new ride
+
     const rideData = {
       name: newRide.name,
       startlocation: newRide.startlocation,
       endlocation: newRide.endlocation,
-      numPassengers: parseInt(newRide.numPassengers, 10), // Ensure numPassengers is an integer
+      numPassengers: parseInt(newRide.numPassengers, 10),
+      isEmergency: newRide.isEmergency,
     };
-  
+
     try {
-      // Make the API call to add the new ride
       const response = await fetch('http://127.0.0.1:8000/ride-api/rides/', {
         method: 'POST',
         headers: {
@@ -56,23 +55,17 @@ const QueueScreen = () => {
         },
         body: JSON.stringify(rideData),
       });
-  
+
       if (!response.ok) {
         throw new Error(`API call failed with status: ${response.status}`);
       }
-  
-      // After a successful addition, clear the input fields
-      setNewRide({ name: '', startlocation: '', endlocation: '', numPassengers: '' });
-      
-      // Fetch the updated list of rides
+
+      setNewRide({ name: '', startlocation: '', endlocation: '', numPassengers: '', isEmergency: false });
       fetchRides();
     } catch (error) {
       console.error('Failed to add ride:', error);
-      // Implement additional error handling if needed
     }
   };
-  
-  
 
   return (
     <SafeAreaView style={styles.container}>
@@ -83,7 +76,6 @@ const QueueScreen = () => {
       >
         <Text style={styles.addButtonText}>Add New Ride</Text>
       </TouchableOpacity>
-
       <Modal
         animationType="slide"
         transparent={true}
@@ -95,7 +87,6 @@ const QueueScreen = () => {
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
             <Text style={styles.modalText}>New Ride Details</Text>
-            {/* Input fields for the new ride details */}
             <TextInput
               style={styles.input}
               onChangeText={(text) => setNewRide({ ...newRide, name: text })}
@@ -121,6 +112,16 @@ const QueueScreen = () => {
               placeholder="Number of Passengers"
               keyboardType="numeric"
             />
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
+              <Text>Is Emergency: </Text>
+              <Switch
+                trackColor={{ false: "#767577", true: "#ff0000" }}
+                thumbColor={newRide.isEmergency ? "#f4f3f4" : "#f4f3f4"}
+                ios_backgroundColor="#3e3e3e"
+                onValueChange={() => setNewRide({ ...newRide, isEmergency: !newRide.isEmergency })}
+                value={newRide.isEmergency}
+              />
+            </View>
             <TouchableOpacity
               style={[styles.button, styles.buttonClose]}
               onPress={addRide}
@@ -200,4 +201,3 @@ const styles = StyleSheet.create({
 });
 
 export default QueueScreen;
-

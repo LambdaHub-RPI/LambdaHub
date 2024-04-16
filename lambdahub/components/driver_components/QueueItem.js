@@ -21,7 +21,7 @@ const QueueItem = ({ data }) => {
 
   return (
     <Animated.View
-      style={[styles.itemContainer, { transform: [{ translateX: pan.x }] }]}
+      style={[styles.itemContainer, { transform: [{ translateX: pan.x }] }, data.isEmergency && styles.emergencyItem]}
       {...panResponder.panHandlers}
     >
       <Text style={styles.name}>{data.name}</Text>
@@ -56,6 +56,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
+  },
+  emergencyItem: {
+    backgroundColor: '#FF6347', // Tomato red for emergency items
   },
   name: {
     fontSize: 20,

@@ -1,101 +1,81 @@
-import React, { useState, useMemo } from 'react';
-import { StyleSheet, Animated, PanResponder, Text, View, Alert } from 'react-native';
+import React from 'react';
+import { StyleSheet, View, Text, Animated, PanResponder } from 'react-native';
 
-const SlideableButton = ({ text, onDelete, onLongPress }) => {
-    const pan = useState(new Animated.ValueXY())[0];
+const QueueItem = ({ data }) => {
+  const pan = new Animated.ValueXY();
 
-    // Prepare animated event and pan responder with added long-press logic
-    const panResponder = useMemo(() => PanResponder.create({
-        onStartShouldSetPanResponder: () => true,
-        onPanResponderMove: Animated.event([
-            null,
-            { dx: pan.x }
-        ], {
-            useNativeDriver: false,
-        }),
-        onPanResponderRelease: (_, gesture) => {
-            if (gesture.dx < -150) {
-                Animated.timing(pan, {
-                    toValue: { x: -500, y: 0 },
-                    duration: 200,
-                    useNativeDriver: true,
-                }).start(onDelete);
-            } else {
-                Animated.spring(pan, {
-                    toValue: { x: 0, y: 0 },
-                    friction: 5,
-                    useNativeDriver: true,
-                }).start();
-            }
-        },
-        onLongPress: onLongPress, // Handle long press
-    }), [pan, onDelete, onLongPress]);
+  const panResponder = PanResponder.create({
+    onStartShouldSetPanResponder: () => true,
+    onPanResponderMove: Animated.event([null, { dx: pan.x }], { useNativeDriver: false }),
+    onPanResponderRelease: () => {
+      Animated.spring(pan, {
+        toValue: { x: 0, y: 0 },
+        friction: 5,
+        useNativeDriver: false,
+      }).start();
+    },
+  });
 
-    return (
-        <Animated.View
-            style={[
-                styles.slideableButton,
-                {
-                    transform: [{ translateX: pan.x }],
-                    opacity: pan.x.interpolate({
-                        inputRange: [-200, 0],
-                        outputRange: [0.5, 1],
-                        extrapolate: 'clamp',
-                    }),
-                },
-            ]}
-            {...panResponder.panHandlers}
-        >
-            <Text style={styles.slideableButtonText}>{text}</Text>
-        </Animated.View>
-    );
+  // Formatting rideTime for display
+  const formattedTime = new Date('1970-01-01T' + data.rideTime + 'Z').toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+  return (
+    <Animated.View
+      style={[styles.itemContainer, { transform: [{ translateX: pan.x }] }]}
+      {...panResponder.panHandlers}
+    >
+      <Text style={styles.name}>{data.name}</Text>
+      <View style={styles.detailRow}>
+        <Text style={styles.label}>From:</Text>
+        <Text style={styles.detail}>{data.startlocation}</Text>
+      </View>
+      <View style={styles.detailRow}>
+        <Text style={styles.label}>To:</Text>
+        <Text style={styles.detail}>{data.endlocation}</Text>
+      </View>
+      <View style={styles.detailRow}>
+        <Text style={styles.label}>Passengers:</Text>
+        <Text style={styles.detail}>{data.numPassengers}</Text>
+      </View>
+      <View style={styles.detailRow}>
+        <Text style={styles.label}>Time:</Text>
+        <Text style={styles.detail}>{formattedTime}</Text>
+      </View>
+    </Animated.View>
+  );
 };
-
-const QueueItem = ({ id, requestors_name, fromWhere, toWhere, numPassengers, onDelete, onAttemptMerge }) => {
-    const [deleted, setDeleted] = useState(false);
-
-    const handleDelete = () => {
-        onDelete();
-        setDeleted(true); // Set the "Deleted" flag to true
-    };
-
-    const handleLongPress = () => {
-        onAttemptMerge(id, numPassengers); // Parent handles logic to determine if merge is possible
-    };
-
-    return !deleted ? (
-        <SlideableButton
-            text={`${requestors_name} with ${numPassengers} passengers\n${fromWhere} to ${toWhere}`}
-            onDelete={handleDelete}
-            onLongPress={handleLongPress}
-        />
-    ) : null;
-};
-
 
 const styles = StyleSheet.create({
-    slideableButton: {
-        backgroundColor: '#4CAF50',
-        padding: 15,
-        marginVertical: 10,
-        borderRadius: 10,
-        alignItems: 'center',
-        justifyContent: 'center',
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
-        elevation: 5,
-    },
-    slideableButtonText: {
-        fontSize: 16,
-        color: '#fff',
-        textAlign: 'center',
-    },
+  itemContainer: {
+    padding: 20,
+    marginVertical: 10,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 10,
+    elevation: 3,
+    shadowRadius: 3,
+    shadowOpacity: 0.2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+  },
+  name: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#333333',
+    marginBottom: 10,
+  },
+  detailRow: {
+    flexDirection: 'row',
+    marginBottom: 5,
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#007AFF',
+  },
+  detail: {
+    fontSize: 16,
+    marginLeft: 5,
+  },
 });
-
 
 export default QueueItem;
