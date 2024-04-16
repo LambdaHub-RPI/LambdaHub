@@ -1,16 +1,203 @@
-export const DUMMY_DATA = [
-    {id: 0, requestors_name: "nevinssofat", fromWhere: "NutHut", toWhere: "House", numPassengers: 0 },
-    {id: 1,requestors_name: "Jason1", fromWhere: "NutHut1", toWhere: "House1", numPassengers: 1 },
-    {id: 2,requestors_name: "Jason2", fromWhere: "NutHut2", toWhere: "House2", numPassengers: 2 },
-    {id: 3,requestors_name: "Jason3", fromWhere: "NutHut3", toWhere: "House3", numPassengers: 3 },
-    {id: 4,requestors_name: "Jason4", fromWhere: "NutHut4", toWhere: "House4", numPassengers: 4 },
-    {id: 5,requestors_name: "Jason5", fromWhere: "NutHut5", toWhere: "House5", numPassengers: 5 },
-    {id: 6,requestors_name: "Jason6", fromWhere: "NutHut6", toWhere: "House6", numPassengers: 6 },
-    {id: 7,requestors_name: "Jason7", fromWhere: "NutHut7", toWhere: "House7", numPassengers: 7 },
-    {id: 8,requestors_name: "Jason8", fromWhere: "NutHut8", toWhere: "House8", numPassengers: 8 },
-    {id: 9,requestors_name: "Jason9", fromWhere: "NutHut9", toWhere: "House9", numPassengers: 9 },
-    {id: 10,requestors_name: "Jason10", fromWhere: "NutHut10", toWhere: "House10", numPassengers: 10 },
-    {id: 11,requestors_name: "Jason11", fromWhere: "NutHut11", toWhere: "House11", numPassengers: 11 },
-    {id: 12,requestors_name: "Jason12", fromWhere: "NutHut12", toWhere: "House12", numPassengers: 12 }
+import React, { useState, useEffect } from 'react';
+import {
+  SafeAreaView,
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Modal,
+  TextInput,
+  Switch, // Importing Switch component
+} from 'react-native';
+import QueueList from '../components/driver_components/QueueList';
 
-]
+const QueueScreen = () => {
+  const [rides, setRides] = useState([]);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [newRide, setNewRide] = useState({
+    name: '',
+    startlocation: '',
+    endlocation: '',
+    numPassengers: '',
+    isEmergency: false,
+  });
+
+  useEffect(() => {
+    fetchRides();
+  }, []);
+
+  const fetchRides = async () => {
+    try {
+      const response = await fetch('http://127.0.0.1:8000/ride-api/rides/');
+      const data = await response.json();
+      setRides(data);
+    } catch (error) {
+      console.error('Failed to fetch rides:', error);
+    }
+  };
+
+  const addRide = async () => {
+    setModalVisible(false);
+
+    const rideData = {
+      name: newRide.name,
+      startlocation: newRide.startlocation,
+      endlocation: newRide.endlocation,
+      numPassengers: parseInt(newRide.numPassengers, 10),
+      isEmergency: newRide.isEmergency,
+    };
+
+    try {
+      const response = await fetch('http://127.0.0.1:8000/ride-api/rides/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(rideData),
+      });
+
+      if (!response.ok) {
+        throw new Error(`API call failed with status: ${response.status}`);
+      }
+
+      setNewRide({ name: '', startlocation: '', endlocation: '', numPassengers: '', isEmergency: false });
+      fetchRides();
+    } catch (error) {
+      console.error('Failed to add ride:', error);
+    }
+  };
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <QueueList data={rides} />
+      <TouchableOpacity
+        style={styles.addButton}
+        onPress={() => setModalVisible(true)}
+      >
+        <Text style={styles.addButtonText}>Add New Ride</Text>
+      </TouchableOpacity>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(!modalVisible);
+        }}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalText}>New Ride Details</Text>
+            <TextInput
+              style={styles.input}
+              onChangeText={(text) => setNewRide({ ...newRide, name: text })}
+              value={newRide.name}
+              placeholder="Name"
+            />
+            <TextInput
+              style={styles.input}
+              onChangeText={(text) => setNewRide({ ...newRide, startlocation: text })}
+              value={newRide.startlocation}
+              placeholder="Start Location"
+            />
+            <TextInput
+              style={styles.input}
+              onChangeText={(text) => setNewRide({ ...newRide, endlocation: text })}
+              value={newRide.endlocation}
+              placeholder="End Location"
+            />
+            <TextInput
+              style={styles.input}
+              onChangeText={(text) => setNewRide({ ...newRide, numPassengers: text })}
+              value={newRide.numPassengers}
+              placeholder="Number of Passengers"
+              keyboardType="numeric"
+            />
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
+              <Text>Is Emergency: </Text>
+              <Switch
+                trackColor={{ false: "#767577", true: "#ff0000" }}
+                thumbColor={newRide.isEmergency ? "#f4f3f4" : "#f4f3f4"}
+                ios_backgroundColor="#3e3e3e"
+                onValueChange={() => setNewRide({ ...newRide, isEmergency: !newRide.isEmergency })}
+                value={newRide.isEmergency}
+              />
+            </View>
+            <TouchableOpacity
+              style={[styles.button, styles.buttonClose]}
+              onPress={addRide}
+            >
+              <Text style={styles.textStyle}>Add Ride</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+    </SafeAreaView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  addButton: {
+    backgroundColor: '#2196F3',
+    padding: 10,
+    borderRadius: 20,
+    margin: 20,
+  },
+  addButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    textAlign: 'center',
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  input: {
+    width: 200,
+    height: 40,
+    marginBottom: 12,
+    borderWidth: 1,
+    padding: 10,
+    borderRadius: 5,
+  },
+  button: {
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2,
+    marginTop: 10,
+  },
+  buttonClose: {
+    backgroundColor: "#2196F3",
+  },
+  textStyle: {
+    color: "white",
+    fontWeight: "bold",
+    textAlign: "center"
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: "center"
+  },
+});
+
+export default QueueScreen;

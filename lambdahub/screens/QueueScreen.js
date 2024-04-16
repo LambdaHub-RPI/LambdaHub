@@ -7,7 +7,8 @@ import {
   TouchableOpacity,
   Modal,
   TextInput,
-  Switch, // Importing Switch component
+  Switch,
+  Alert,
 } from 'react-native';
 import QueueList from '../components/driver_components/QueueList';
 
@@ -67,6 +68,35 @@ const QueueScreen = () => {
     }
   };
 
+  const completeRide = async () => {
+    console.log(rides)
+    if (rides.length > 0) {
+      console.log(rides)
+      console.log(rides[0].id)
+      const oldestRideId = rides[0].id; // Assuming the first ride in the list is the oldest
+
+      try {
+        const response = await fetch(`http://127.0.0.1:8000/ride-api/rides/${oldestRideId}/`, {
+          method: 'DELETE',
+        });
+
+
+        
+        if (!response.ok) {
+          throw new Error(`API call failed with status: ${response.status}`);
+        }
+
+        Alert.alert("Success", "Ride completed and removed.");
+        fetchRides(); // Refresh the list of rides
+      } catch (error) {
+        console.error('Failed to complete ride:', error);
+        Alert.alert("Error", "Failed to complete ride.");
+      }
+    } else {
+      Alert.alert("Info", "No rides to complete.");
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <QueueList data={rides} />
@@ -75,6 +105,12 @@ const QueueScreen = () => {
         onPress={() => setModalVisible(true)}
       >
         <Text style={styles.addButtonText}>Add New Ride</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.completeButton}
+        onPress={completeRide}
+      >
+        <Text style={styles.completeButtonText}>Complete Ride</Text>
       </TouchableOpacity>
       <Modal
         animationType="slide"
@@ -147,6 +183,17 @@ const styles = StyleSheet.create({
     margin: 20,
   },
   addButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    textAlign: 'center',
+  },
+  completeButton: {
+    backgroundColor: '#FF6347', // Changed to a distinct color for visibility
+    padding: 10,
+    borderRadius: 20,
+    margin: 20,
+  },
+  completeButtonText: {
     color: '#fff',
     fontSize: 18,
     textAlign: 'center',
