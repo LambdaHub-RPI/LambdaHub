@@ -6,12 +6,7 @@ import {Agenda} from 'react-native-calendars';
 
 export default function AgendaScreen() {
 
-    const [items, setItems] = useState({
-        "2024-04-09": [{ name: "Meeting 1", data: 'this is the first meeting', startTime: '12:00:00', endTime: '3:00:00' }],
-        "2024-04-10": [{ name: "Meeting 2", data: 'this is the first meeting' }],
-        "2024-04-11": [{ name: "Meeting 3", data: 'this is the first meeting' }]
-        //"2024-04-12": []
-    });
+    const [items, setItems] = useState({});
 
     useEffect(() => {
         fetchData();
@@ -19,10 +14,11 @@ export default function AgendaScreen() {
 
     const fetchData = async () => {
         try {
-            const response = await fetch(':8000/event-api/events/');
+            console.log("running backend");
+            const response = await fetch('http://:8000/event-api/events/');
             const data = await response.json();
 
-            const updatedItems = { ...items };
+            const updatedItems = {};
 
             data.forEach((event) => {
                 const time = new Date(event.date);
@@ -31,8 +27,8 @@ export default function AgendaScreen() {
                 if (!updatedItems[strTime]) {
                     updatedItems[strTime] = [];
                 }
-
                 updatedItems[strTime].push({
+                    id: event.id,
                     name: event.name,
                     startTime: event.starttime,
                     endTime: event.endtime,
@@ -45,6 +41,27 @@ export default function AgendaScreen() {
             console.error('Error loading items:', error);
         }
     };
+
+    const handleDeleteEvent = async (event) => {
+        try {
+            // Send a DELETE request to your Django backend API
+            const response = await fetch(`http://:8000/event-api/events/${event.id}/`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+    
+            if (!response.ok) {
+                throw new Error('Failed to delete event');
+            }
+        } catch (error) {
+            console.error('Error deleting event:', error);
+            Alert.alert('Error', 'Failed to delete event');
+        }
+
+    };
+    
     
     
     return (
@@ -57,6 +74,9 @@ export default function AgendaScreen() {
                             <Text style={styles.itemName}>{item.name}</Text>
                             <Text style={styles.time}>{item.startTime} - {item.endTime}</Text>
                             <Text style={styles.itemData}>{item.data}</Text>
+                            <TouchableOpacity onPress={() => handleDeleteEvent(item)}>
+                                <Text style={styles.deleteButton}>Delete</Text>
+                            </TouchableOpacity>
                         </View>
                     </TouchableOpacity>
                 )}
@@ -68,6 +88,7 @@ export default function AgendaScreen() {
                     );
                 }}
                 loadItemsForMonth={ async (data) => {
+                    console.log("running this");
                     const currentDate = new Date();
                     const updatedItems = { ...items };
                     var date = new Date(data.dateString);
@@ -76,17 +97,17 @@ export default function AgendaScreen() {
                         date = currentDate;
                     }
 
-                    // Load the last 10 days and next 31 with empty lists
+                    
                     for (let i = -10; i < 31; i++) {
-                        const newdate = new Date();
+                        const newdate = new Date(date);
                         newdate.setDate(date.getDate() + i);
-                        //console.log(date.toISOString().slice(0, 10), i);
                         if(!updatedItems[newdate.toISOString().slice(0, 10)]){
                             updatedItems[newdate.toISOString().slice(0, 10)] = []; 
                         }
                     }
                     setItems(updatedItems);
                 }}
+                
             />
             
         </SafeAreaView>
@@ -104,7 +125,7 @@ const styles = StyleSheet.create({
         marginHorizontal: 10,
         marginLeft: 0,
         marginTop: 10,
-        height:100,
+        height:120,
         shadowColor: '#000',
         shadowOffset: {
           width: 0,
@@ -162,5 +183,11 @@ const styles = StyleSheet.create({
       },
       dayItem: {
         marginLeft: 34
-      }
+      },
+      deleteButton: {
+        color: 'red',
+        fontSize: 16,
+        fontWeight: 'bold',
+        marginTop: 5,
+    },
 });
