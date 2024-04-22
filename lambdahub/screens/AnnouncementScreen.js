@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput, Button, TouchableOpacity} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TextInput, Button, TouchableOpacity, FlatList} from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import Modal from 'react-native-modal';
+import { DUMMY_DATA } from "./dummy.js";
 
 const Stack = createStackNavigator();
 
 function AnnouncementScreenContent({ navigation }) {
-  const [input, setInput] = useState([]);
   const [isCreateModalVisible, setCreateModalVisible] = useState(false);
   const [isExpandModalVisible, setExpandModalVisible] = useState(false);
   const [modalInput, setModalInput] = useState({
@@ -15,16 +15,16 @@ function AnnouncementScreenContent({ navigation }) {
     date: '',
     announcement: '',
   });
-  const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
+  const [selectedAnnouncement, setSelectedAnnouncement] = useState(DUMMY_DATA);
 
   const handleAdd = () => {
     setCreateModalVisible(true);
   };
 
   const handleRemove = (index) => {
-    const newInputs = [...input];
-    newInputs.splice(index, 1);
-    setInput(newInputs);
+    DUMMY_DATA.splice(index, 1);
+    const newAnnouncements = DUMMY_DATA.slice();
+    setSelectedAnnouncement(newAnnouncements);
   };
 
   const closeModal = () => {
@@ -44,8 +44,8 @@ function AnnouncementScreenContent({ navigation }) {
       announcement: modalInput.announcement,
     };
   
-    setInput(prevInput => [...prevInput, newAnnouncement]);
-  
+    DUMMY_DATA.unshift(newAnnouncement);
+
     const formatDate = (date) => {
       const day = date.getDate().toString().padStart(2, '0');
       const month = (date.getMonth() + 1).toString().padStart(2, '0');
@@ -64,7 +64,7 @@ function AnnouncementScreenContent({ navigation }) {
   };
 
   const handleExpand = (index) => {
-    setSelectedAnnouncement(input[index]);
+    setSelectedAnnouncement(DUMMY_DATA[index]);
     setExpandModalVisible(true);
   };
 
@@ -78,7 +78,7 @@ function AnnouncementScreenContent({ navigation }) {
     <ScrollView contentContainerStyle={styles.container}>
       <Button title="Create New Announcement" onPress={handleAdd} />
       <View style={styles.announcementContainer}>
-        {input.map((announcement, index) => (
+        {DUMMY_DATA.map((announcement, index) => (
           <View key={`${announcement.title}-${announcement.author}-${index}`} style={styles.announcementItem}>
           <View style={styles.innerAnnouncementItem}>
             <View style={styles.titleCont}>
@@ -149,7 +149,7 @@ function AnnouncementScreenContent({ navigation }) {
             style={[styles.modalInput, styles.modalTextArea]}
           />
           <Button title="Submit" onPress={handleModalSubmit} />
-          <Button title="Close Modal" onPress={closeModal} />
+          <Button title="Cancel" onPress={closeModal} />
         </ScrollView>
       </Modal>
 
@@ -226,6 +226,12 @@ const styles = StyleSheet.create({
 
   dateText: {
     color: 'black',
+    fontWeight: 'bold',
+  },
+
+  authorText: {
+    color: 'black',
+    fontWeight: 'bold',
   },
 
   customButton: {
