@@ -1,18 +1,25 @@
 import React from 'react';
 import { StyleSheet, View, Text, Animated, PanResponder } from 'react-native';
 
-const QueueItem = ({ data }) => {
+const QueueItem = ({ data, onDelete }) => {
   const pan = new Animated.ValueXY();
 
+  // Setup the pan responder to handle user gestures
   const panResponder = PanResponder.create({
     onStartShouldSetPanResponder: () => true,
     onPanResponderMove: Animated.event([null, { dx: pan.x }], { useNativeDriver: false }),
     onPanResponderRelease: () => {
-      Animated.spring(pan, {
-        toValue: { x: 0, y: 0 },
-        friction: 5,
-        useNativeDriver: false,
-      }).start();
+      // Check if the swipe distance is sufficient to trigger deletion
+      if (pan.x._value > 100) { // Threshold for a significant swipe to the right
+        onDelete(data.identifier); // Call the onDelete function passed from the parent component
+      } else {
+        // Reset the animation if not swiped far enough
+        Animated.spring(pan, {
+          toValue: { x: 0, y: 0 },
+          friction: 5,
+          useNativeDriver: false,
+        }).start();
+      }
     },
   });
 
