@@ -19,7 +19,7 @@ export default function AddEventScreen({ navigation }) {
         endtime: endTime,
       };
   
-      const response = await fetch('http://:8000/event-api/events/', {
+      const response = await fetch('http://129.161.214.87:8000/event-api/events/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
