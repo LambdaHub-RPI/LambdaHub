@@ -30,16 +30,18 @@ const QueueScreen = () => {
   const fetchRides = async () => {
     try {
       const response = await fetch('http://127.0.0.1:8000/ride-api/rides/');
-      const data = await response.json();
+      let data = await response.json();
+      data = data.sort((a, b) => b.isEmergency - a.isEmergency); // Sorting logic
       setRides(data);
     } catch (error) {
       console.error('Failed to fetch rides:', error);
     }
   };
 
+
   const addRide = async () => {
     setModalVisible(false);
-
+  
     const rideData = {
       name: newRide.name,
       startlocation: newRide.startlocation,
@@ -47,7 +49,7 @@ const QueueScreen = () => {
       numPassengers: parseInt(newRide.numPassengers, 10),
       isEmergency: newRide.isEmergency,
     };
-
+  
     try {
       const response = await fetch('http://127.0.0.1:8000/ride-api/rides/', {
         method: 'POST',
@@ -56,18 +58,19 @@ const QueueScreen = () => {
         },
         body: JSON.stringify(rideData),
       });
-
+  
       if (!response.ok) {
         throw new Error(`API call failed with status: ${response.status}`);
       }
-
+  
+      const newRides = [...rides, rideData].sort((a, b) => b.isEmergency - a.isEmergency);
+      setRides(newRides);
       setNewRide({ name: '', startlocation: '', endlocation: '', numPassengers: '', isEmergency: false });
-      fetchRides();
     } catch (error) {
       console.error('Failed to add ride:', error);
     }
   };
-
+  
   const completeRide = async () => {
     console.log(rides)
     if (rides.length > 0) {
