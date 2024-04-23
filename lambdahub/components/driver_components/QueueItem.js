@@ -24,22 +24,24 @@ const QueueItem = ({ data }) => {
       style={[styles.itemContainer, { transform: [{ translateX: pan.x }] }, data.isEmergency && styles.emergencyItem]}
       {...panResponder.panHandlers}
     >
-      <Text style={styles.name}>{data.name}</Text>
-      <View style={styles.detailRow}>
-        <Text style={styles.label}>From:</Text>
-        <Text style={styles.detail}>{data.startlocation}</Text>
-      </View>
-      <View style={styles.detailRow}>
-        <Text style={styles.label}>To:</Text>
-        <Text style={styles.detail}>{data.endlocation}</Text>
-      </View>
-      <View style={styles.detailRow}>
-        <Text style={styles.label}>Passengers:</Text>
-        <Text style={styles.detail}>{data.numPassengers}</Text>
-      </View>
-      <View style={styles.detailRow}>
-        <Text style={styles.label}>Time:</Text>
-        <Text style={styles.detail}>{formattedTime}</Text>
+      <View style={styles.content}>
+        <Text style={styles.name}>{data.name}</Text>
+        <View style={styles.detailRow}>
+          <Text style={styles.label}>From:</Text>
+          <Text style={styles.detail}>{data.startlocation}</Text>
+        </View>
+        <View style={styles.detailRow}>
+          <Text style={styles.label}>To:</Text>
+          <Text style={styles.detail}>{data.endlocation}</Text>
+        </View>
+        <View style={styles.detailRow}>
+          <Text style={styles.label}>Passengers:</Text>
+          <Text style={styles.detail}>{data.numPassengers}</Text>
+        </View>
+        <View style={styles.detailRow}>
+          <Text style={styles.label}>Time:</Text>
+          <Text style={styles.detail}>{formattedTime}</Text>
+        </View>
       </View>
     </Animated.View>
   );
@@ -47,8 +49,8 @@ const QueueItem = ({ data }) => {
 
 const styles = StyleSheet.create({
   itemContainer: {
-    padding: 20,
-    marginVertical: 10,
+    padding: 10,
+    marginVertical: 8,
     backgroundColor: '#FFFFFF',
     borderRadius: 10,
     elevation: 3,
@@ -60,23 +62,29 @@ const styles = StyleSheet.create({
   emergencyItem: {
     backgroundColor: '#FF6347', // Tomato red for emergency items
   },
+  content: {
+    alignItems: 'center', // Centers content horizontally
+    justifyContent: 'center', // Centers content vertically
+    flex: 1,
+  },
   name: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
     color: '#333333',
-    marginBottom: 10,
+    marginBottom: 5,
   },
   detailRow: {
     flexDirection: 'row',
-    marginBottom: 5,
+    marginBottom: 3,
+    alignItems: 'center', // Align items in the center vertically within each row
   },
   label: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 'bold',
     color: '#007AFF',
   },
   detail: {
-    fontSize: 16,
+    fontSize: 14,
     marginLeft: 5,
   },
 });
