@@ -4,6 +4,7 @@ import { Agenda } from 'react-native-calendars';
 
 export default function AgendaScreen() {
     const [items, setItems] = useState({});
+    const [selectedEvent, setSelectedEvent] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);
     const [editedName, setEditedName] = useState('');
     const [editedDescription, setEditedDescription] = useState('');
@@ -65,7 +66,47 @@ export default function AgendaScreen() {
         }
     };
 
-    
+    const handleEditEvent = async () => {
+        try {
+            // Send a PUT request to update the event
+            const response = await fetch(`http://129.161.214.87:8000/event-api/events/${selectedEvent.id}/`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: editedName,
+                    description: editedDescription,
+                    date: editedDate,
+                    starttime: editedStartTime,
+                    endtime: editedEndTime,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to update event');
+            }
+
+            // Refresh data after update
+            fetchData();
+
+            // Close modal
+            setModalVisible(false);
+        } catch (error) {
+            console.error('Error updating event:', error);
+            Alert.alert('Error', 'Failed to update event');
+        }
+    };
+
+    const handleEventPress = (item) => {
+        setSelectedEvent(item);
+        setEditedName(item.name);
+        setEditedDescription(item.data);
+        setEditedDate(item.date);
+        setEditedStartTime(item.startTime);
+        setEditedEndTime(item.endTime);
+        setModalVisible(true);
+    };
 
     return (
         <SafeAreaView style={styles.container}>
