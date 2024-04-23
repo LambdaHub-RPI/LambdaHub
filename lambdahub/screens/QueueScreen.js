@@ -11,6 +11,7 @@ import {
   Alert,
 } from 'react-native';
 import QueueList from '../components/driver_components/QueueList';
+import { Picker } from '@react-native-picker/picker';
 
 const QueueScreen = () => {
   const [rides, setRides] = useState([]);
@@ -103,7 +104,6 @@ const QueueScreen = () => {
       >
         <Text style={styles.addButtonText}>Add New Ride</Text>
       </TouchableOpacity>
-
       <Modal
         animationType="slide"
         transparent={true}
@@ -121,18 +121,30 @@ const QueueScreen = () => {
               value={newRide.name}
               placeholder="Name"
             />
-            <TextInput
-              style={styles.input}
-              onChangeText={(text) => setNewRide({ ...newRide, startlocation: text })}
-              value={newRide.startlocation}
-              placeholder="Start Location"
-            />
-            <TextInput
-              style={styles.input}
-              onChangeText={(text) => setNewRide({ ...newRide, endlocation: text })}
-              value={newRide.endlocation}
-              placeholder="End Location"
-            />
+            <Text style={styles.label}>From Location:</Text>
+            <Picker
+              selectedValue={newRide.fromLocation}
+              onValueChange={(itemValue, itemIndex) =>
+                setNewRide({ ...newRide, fromLocation: itemValue })
+              }
+              style={styles.picker}
+            >
+              {['NutHut', 'Alpine', 'HOUSE', '288 Hoosick'].map((location, index) => (
+                <Picker.Item key={index} label={location} value={location} />
+              ))}
+            </Picker>
+            <Text style={styles.label}>To Location:</Text>
+            <Picker
+              selectedValue={newRide.toLocation}
+              onValueChange={(itemValue, itemIndex) =>
+                setNewRide({ ...newRide, toLocation: itemValue })
+              }
+              style={styles.picker}
+            >
+              {['NutHut', 'Alpine', 'HOUSE', '288 Hoosick'].map((location, index) => (
+                <Picker.Item key={index} label={location} value={location} />
+              ))}
+            </Picker>
             <TextInput
               style={styles.input}
               onChangeText={(text) => setNewRide({ ...newRide, numPassengers: text })}
@@ -141,7 +153,7 @@ const QueueScreen = () => {
               keyboardType="numeric"
             />
             <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
-              <Text>Is Emergency: </Text>
+              <Text>Is Emergency:</Text>
               <Switch
                 trackColor={{ false: "#767577", true: "#ff0000" }}
                 thumbColor={newRide.isEmergency ? "#f4f3f4" : "#f4f3f4"}
@@ -179,17 +191,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     textAlign: 'center',
   },
-  completeButton: {
-    backgroundColor: '#FF6347', // Changed to a distinct color for visibility
-    padding: 10,
-    borderRadius: 20,
-    margin: 20,
-  },
-  completeButtonText: {
-    color: '#fff',
-    fontSize: 18,
-    textAlign: 'center',
-  },
   centeredView: {
     flex: 1,
     justifyContent: 'center',
@@ -219,6 +220,11 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
   },
+  picker: {
+    width: 200,
+    height: 44,
+    marginBottom: 20,
+  },
   button: {
     borderRadius: 20,
     padding: 10,
@@ -231,11 +237,16 @@ const styles = StyleSheet.create({
   textStyle: {
     color: "white",
     fontWeight: "bold",
-    textAlign: "center"
+    textAlign: "center",
   },
   modalText: {
     marginBottom: 15,
-    textAlign: "center"
+    textAlign: "center",
+  },
+  label: {
+    fontSize: 16,
+    color: '#333',
+    marginBottom: 5,
   },
 });
 
