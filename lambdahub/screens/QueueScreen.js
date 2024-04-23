@@ -71,20 +71,14 @@ const QueueScreen = () => {
     }
   };
   
-  const completeRide = async () => {
+  const deleteRide = async ( identifier ) => {
     console.log(rides)
     if (rides.length > 0) {
       console.log(rides)
-      console.log(rides[0].id)
-      const oldestRideId = rides[0].id; // Assuming the first ride in the list is the oldest
-
       try {
-        const response = await fetch(`http://127.0.0.1:8000/ride-api/rides/${oldestRideId}/`, {
+        const response = await fetch(`http://127.0.0.1:8000/ride-api/rides/${identifier}/`, {
           method: 'DELETE',
         });
-
-
-        
         if (!response.ok) {
           throw new Error(`API call failed with status: ${response.status}`);
         }
@@ -102,19 +96,14 @@ const QueueScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <QueueList data={rides} />
+      <QueueList data={rides} onDelete={deleteRide} />
       <TouchableOpacity
         style={styles.addButton}
         onPress={() => setModalVisible(true)}
       >
         <Text style={styles.addButtonText}>Add New Ride</Text>
       </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.completeButton}
-        onPress={completeRide}
-      >
-        <Text style={styles.completeButtonText}>Complete Ride</Text>
-      </TouchableOpacity>
+
       <Modal
         animationType="slide"
         transparent={true}
