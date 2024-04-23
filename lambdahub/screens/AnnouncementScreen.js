@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TextInput, Button, TouchableOpacity, FlatList} from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import Modal from 'react-native-modal';
-import { DUMMY_DATA } from "./dummy.js";
 
 const Stack = createStackNavigator();
 
@@ -15,15 +14,30 @@ function AnnouncementScreenContent({ navigation }) {
     date: '',
     announcement: '',
   });
-  const [selectedAnnouncement, setSelectedAnnouncement] = useState(DUMMY_DATA);
+  const [selectedAnnouncement, setSelectedAnnouncement] = useState([]);
+
+  useEffect(()=> {
+    fetchData();
+  }, [])
+
+  const fetchData = async() => {
+    try {
+      const response = await fetch("http://127.0.0.1:8000/announcement-api/announcements/");
+      let data = await response.json();
+      setSelectedAnnouncement(data);
+    }
+    catch (error) {
+      console.error("Failed to fetch announcements!", error);
+    }
+  };
 
   const handleAdd = () => {
     setCreateModalVisible(true);
   };
 
   const handleRemove = (index) => {
-    DUMMY_DATA.splice(index, 1);
-    const newAnnouncements = DUMMY_DATA.slice();
+    selectedAnnouncement.splice(index, 1);
+    const newAnnouncements = selectedAnnouncement.slice();
     setSelectedAnnouncement(newAnnouncements);
   };
 
@@ -44,7 +58,7 @@ function AnnouncementScreenContent({ navigation }) {
       announcement: modalInput.announcement,
     };
   
-    DUMMY_DATA.unshift(newAnnouncement);
+    selectedAnnouncement.unshift(newAnnouncement);
 
     const formatDate = (date) => {
       const day = date.getDate().toString().padStart(2, '0');
@@ -64,7 +78,7 @@ function AnnouncementScreenContent({ navigation }) {
   };
 
   const handleExpand = (index) => {
-    setSelectedAnnouncement(DUMMY_DATA[index]);
+    setSelectedAnnouncement(selectedAnnouncement[index]);
     setExpandModalVisible(true);
   };
 
@@ -78,7 +92,7 @@ function AnnouncementScreenContent({ navigation }) {
     <ScrollView contentContainerStyle={styles.container}>
       <Button title="Create New Announcement" onPress={handleAdd} />
       <View style={styles.announcementContainer}>
-        {DUMMY_DATA.map((announcement, index) => (
+        {selectedAnnouncement.map((announcement, index) => (
           <View key={`${announcement.title}-${announcement.author}-${index}`} style={styles.announcementItem}>
           <View style={styles.innerAnnouncementItem}>
             <View style={styles.titleCont}>

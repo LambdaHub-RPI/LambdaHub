@@ -1,8 +1,8 @@
 export const DUMMY_DATA = [
     {id: 1, title: "Last Night", author: "Morgan Wallen", announcement: "Last night we let the liquor talk\nI can't remember everything we said, but we said it all\nYou told me that you wish I was somebody you never met\nBut baby, baby, something's tellin' me this ain't over yet\nNo way it was our last night", date: "04/18/2024"},
-    {id: 1, title: "90210", author: "Travis Scott", announcement: "In that 90210, 90210, looking for that alley\nIn the 90210, 90210, looking for that alley, ooh\nIt's the superstar girl\nSuperstar girl, roaming in that alley\nOh, in the 90210, 90210, somewhere in that alley", date: "04/17/2024"},
-    {id: 2, title: "Best I Ever Had", author: "Drake", announcement: "Baby, you my everything\nYou all I ever wanted\nWe could do it real big\nBigger than you ever done it\nYou be up on everything\nOther girls ain't ever on it\nI want this forever\nI swear I can spend whatever on it", date: "04/16/2024"},
-    {id: 3, title: "The Color Violet", author: "Tory Lanez", announcement: "I gave my heart\nSpeedin' car goin' ninety in the rain\nShe took my heart, filled it with nothin' but pain\nThis beat in my hands is not for romance\nI wanna stay but, playboys, we don't dance, dance, dance", date: "04/16/2024"},
-    {id: 4, title: "Party on the West Coast", author: "Snoop Dogg", announcement: "Ain’t no party like a West Coast party\n‘Cause a West Coast party don’t stop.", date: "04/13/2024"},
+    {id: 2, title: "90210", author: "Travis Scott", announcement: "In that 90210, 90210, looking for that alley\nIn the 90210, 90210, looking for that alley, ooh\nIt's the superstar girl\nSuperstar girl, roaming in that alley\nOh, in the 90210, 90210, somewhere in that alley", date: "04/17/2024"},
+    {id: 3, title: "Best I Ever Had", author: "Drake", announcement: "Baby, you my everything\nYou all I ever wanted\nWe could do it real big\nBigger than you ever done it\nYou be up on everything\nOther girls ain't ever on it\nI want this forever\nI swear I can spend whatever on it", date: "04/16/2024"},
+    {id: 4, title: "The Color Violet", author: "Tory Lanez", announcement: "I gave my heart\nSpeedin' car goin' ninety in the rain\nShe took my heart, filled it with nothin' but pain\nThis beat in my hands is not for romance\nI wanna stay but, playboys, we don't dance, dance, dance", date: "04/16/2024"},
+    {id: 5, title: "Party on the West Coast", author: "Snoop Dogg", announcement: "Ain’t no party like a West Coast party\n‘Cause a West Coast party don’t stop.", date: "04/13/2024"},
 
 ]
