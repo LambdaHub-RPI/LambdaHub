@@ -49,10 +49,22 @@ function AnnouncementScreenContent({ navigation }) {
     setCreateModalVisible(true);
   };
 
-  const handleRemove = (index) => {
-    selectedAnnouncement.splice(index, 1);
-    const newAnnouncements = selectedAnnouncement.slice();
-    setSelectedAnnouncement(newAnnouncements);
+  
+  const handleRemove = async (index) => {
+    if (selectedAnnouncement.length > 0) {
+      try {
+        const response = await fetch('http://127.0.0.1:8000/announcement-api/announcements/${selectedAnnouncement[index].id}/', {
+          method: 'DELETE',
+        });
+        if (!response.ok) {
+          throw new Error('API call failed with status: ${response.status}');
+        }
+
+        fetchData();
+      } catch (error) {
+        console.error('Failed to delete announcement', error);
+      }
+    }
   };
 
   const closeModal = () => {
@@ -96,8 +108,13 @@ function AnnouncementScreenContent({ navigation }) {
   };
 
   const handleExpand = (index) => {
-    setSelectedAnnouncement(selectedAnnouncement[index]);
-    setExpandModalVisible(true);
+    if (index >= 0 && index < selectedAnnouncement.length) {
+      const announcementToExpand = selectedAnnouncement[index];
+      setSelectedAnnouncement(announcementToExpand);
+      setExpandModalVisible(true);
+    } else {
+      console.error('Index out of bounds or invalid index');
+    }
   };
 
   const CustomButton = ({ title, onPress, style }) => (
@@ -192,7 +209,7 @@ function AnnouncementScreenContent({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: 'white',
-    paddingTop: 7,
+    paddingTop: 5,
     paddingLeft: 15,
     paddingRight: 15,
     paddingBottom: 25,
@@ -216,21 +233,21 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     borderColor: '#CCCCCC',
     borderRadius: 20,
-    paddingRight: 15,
     paddingBottom: 10,
     shadowColor: '#000',
-    width: 355,
+    width: '100%',
   },
 
   announcementContainer: {
     flex: 1,
     width: '100%',
+    justifyContent: 'center',
   },
 
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    width: 350,
+    width: '100%',
   },
 
   input: {
@@ -270,7 +287,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#093D20', 
     padding: 8,
     borderRadius: 5,
-    marginRight: 10,
   },
   
   customButtonText: {
