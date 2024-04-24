@@ -20,7 +20,7 @@ function HomeScreen() {
           <Text style={styles.announcementAuthor}>Author 1</Text>
           <Text style={styles.announcementDate}>Date 1</Text>
           <Text style={styles.announcementContent}>
-            This is a placeholder for announcement content 1.
+            Placeholder for announcement content 1.
           </Text>
         </View>
 
@@ -30,14 +30,37 @@ function HomeScreen() {
           <Text style={styles.announcementAuthor}>Author 2</Text>
           <Text style={styles.announcementDate}>Date 2</Text>
           <Text style={styles.announcementContent}>
-            This is a placeholder for announcement content 2.
+            Placeholder for announcement content 2.
           </Text>
         </View>
       </View>
 
       <View style={styles.eventsContainer}>
         <Text style={styles.sectionTitle}>Upcoming Events</Text>
-        {/* Placeholder for upcoming events */}
+
+        {/* Event 1 */}
+        <View style={styles.eventItem}>
+          <Text style={styles.eventName}>Event Name 1</Text>
+          <Text style={styles.eventDate}>Date 1</Text>
+          <Text style={styles.eventTime}>
+            Start Time 1 - End Time 1
+          </Text>
+          <Text style={styles.eventDescription}>
+            Placeholder for event description 1.
+          </Text>
+        </View>
+
+        {/* Event 2 */}
+        <View style={styles.eventItem}>
+          <Text style={styles.eventName}>Event Name 2</Text>
+          <Text style={styles.eventDate}>Date 2</Text>
+          <Text style={styles.eventTime}>
+            Start Time 2 - End Time 2
+          </Text>
+          <Text style={styles.eventDescription}>
+            Placeholder for event description 2.
+          </Text>
+        </View>
       </View>
     </ScrollView>
   );
@@ -58,10 +81,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   lambda: {
-    color: '#FFD133', // Hex color for "Lambda"
+    color: '#FFD133', // Color for "Lambda"
   },
   hub: {
-    color: '#5E266D', // Hex color for "Hub"
+    color: '#5E266D', // Color for "Hub"
   },
   announcementsContainer: {
     backgroundColor: '#F5F5F5',
@@ -121,6 +144,33 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
+  },
+  eventItem: {
+    backgroundColor: 'white',
+    padding: 16,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    marginBottom: 16,
+  },
+  eventName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
+  eventDate: {
+    fontSize: 14,
+    color: '#555',
+    marginBottom: 4,
+  },
+  eventTime: {
+    fontSize: 14,
+    color: '#555',
+    marginBottom: 4,
+  },
+  eventDescription: {
+    fontSize: 14,
+    color: '#333',
   },
 });
 
