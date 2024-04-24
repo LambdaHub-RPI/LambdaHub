@@ -154,6 +154,7 @@ function AnnouncementScreenContent({ navigation }) {
   };
   
   
+  
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Button title="Create New Announcement" onPress={handleAdd} />
@@ -179,7 +180,7 @@ function AnnouncementScreenContent({ navigation }) {
             </View>
             <View style={styles.buttonContainer}>
               <CustomButton title="Delete" onPress={() => handleRemove(index)} />
-              <CustomButton title="Edit" onPress={() => handleEdit(index)} />
+              <CustomButton title="Edit" onPress={() => handleRemove(index)} />
               <CustomButton title="Expand" onPress={() => handleExpand(index)}/>
             </View>
           </View>
@@ -269,7 +270,7 @@ function AnnouncementScreenContent({ navigation }) {
           <Button title="Cancel" onPress={closeModal} />
         </ScrollView>
       </Modal>
-
+        
 
     </ScrollView>
   );
