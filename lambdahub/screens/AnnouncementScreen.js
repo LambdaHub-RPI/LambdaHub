@@ -32,6 +32,20 @@ function AnnouncementScreenContent({ navigation }) {
   };
 
   const handleAdd = () => {
+    const formatDate = (date) => {
+      const day = date.getDate().toString().padStart(2, '0');
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+      const year = date.getFullYear();
+      return `${month}/${day}/${year}`;
+    };
+
+    setModalInput({
+      author: '',
+      title: '',
+      date: formatDate(new Date()),
+      announcement: '',
+    });
+
     setCreateModalVisible(true);
   };
 
@@ -50,29 +64,33 @@ function AnnouncementScreenContent({ navigation }) {
     setModalInput((prevInput) => ({ ...prevInput, [key]: text }));
   };
 
-  const handleModalSubmit = () => {
+  const handleModalSubmit = async () => {
     const newAnnouncement = {
       author: modalInput.author,
       title: modalInput.title,
       date: modalInput.date,
       announcement: modalInput.announcement,
     };
-  
-    selectedAnnouncement.unshift(newAnnouncement);
 
-    const formatDate = (date) => {
-      const day = date.getDate().toString().padStart(2, '0');
-      const month = (date.getMonth() + 1).toString().padStart(2, '0');
-      const year = date.getFullYear();
-      return `${month}/${day}/${year}`;
-    };
+    try {
+      const response = await fetch('http://127.0.0.1:8000/announcement-api/announcements/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newAnnouncement)
+      });
+      
 
-    setModalInput({
-      author: '',
-      title: '',
-      date: formatDate(new Date()),
-      announcement: '',
-    });
+      if (!response.ok){
+        throw new Error('API call failed with status: ${response.status}');
+      }
+
+      const newA = [newAnnouncement, ...selectedAnnouncement];
+      setSelectedAnnouncement(newA);
+    } catch (error) {
+        console.error('Failed to add announcement: ', error);
+    }
   
     setCreateModalVisible(false);
   };
