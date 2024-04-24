@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Image } from 'react-native';
 
 function HomeScreen() {
   return (
@@ -62,6 +62,19 @@ function HomeScreen() {
           </Text>
         </View>
       </View>
+
+      <View style={styles.imageContainer}>
+        <Image
+          source={{ uri: 'https://poledeon.org/wp-content/uploads/2021/10/1200px-Lambda_Chi_Alpha_letters_green_on_gold.svg.png' }}
+          style={styles.bottomImage}
+        />
+        <Text style={styles.authorsText}>
+          Authors:
+        </Text>
+        <Text style={styles.namesText}>
+          Nevin Joshy, Jason Greenberg, Adriano Andrade
+        </Text>
+      </View>
     </ScrollView>
   );
 }
@@ -85,6 +98,26 @@ const styles = StyleSheet.create({
   },
   hub: {
     color: '#5E266D', // Color for "Hub"
+  },
+  imageContainer: {
+    marginTop: 16,
+    alignItems: 'center', 
+  },
+  bottomImage: {
+    width: 424,
+    height: 126, 
+    borderRadius: 10,
+  },
+  authorsText: {
+    marginTop: 8,
+    fontSize: 14,
+    color: 'black',
+    fontWeight: 'bold',
+  },
+  namesText: {
+    marginTop: 8,
+    fontSize: 14,
+    color: '#333',
   },
   announcementsContainer: {
     backgroundColor: '#F5F5F5',
