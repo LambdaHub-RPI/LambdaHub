@@ -8,6 +8,8 @@ const Stack = createStackNavigator();
 function AnnouncementScreenContent({ navigation }) {
   const [isCreateModalVisible, setCreateModalVisible] = useState(false);
   const [isExpandModalVisible, setExpandModalVisible] = useState(false);
+  const [isEditModalVisible, setEditModalVisible] = useState(false);
+  const [editModalInput, setEditModalInput] = useState(modalInput);
   const [modalInput, setModalInput] = useState({
     author: '',
     title: '',
@@ -122,6 +124,35 @@ function AnnouncementScreenContent({ navigation }) {
       <Text style={styles.customButtonText}>{title}</Text>
     </TouchableOpacity>
   );
+
+  const handleEdit = (index) => {
+    if (index >= 0 && index < selectedAnnouncement.length) {
+      setEditModalInput(selectedAnnouncement[index]);
+      setEditModalVisible(true); 
+    }
+  };
+
+  const handleEditSubmit = async () => {
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/announcement-api/announcements/${editModalInput.id}/`, {
+        method: 'PATCH', 
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(editModalInput),
+      });
+  
+      if (!response.ok) {
+        throw new Error(`API call failed with status: ${response.status}`);
+      }
+  
+      fetchData();
+      setEditModalVisible(false);
+    } catch (error) {
+      console.error('Failed to edit announcement', error);
+    }
+  };
+  
   
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -148,6 +179,7 @@ function AnnouncementScreenContent({ navigation }) {
             </View>
             <View style={styles.buttonContainer}>
               <CustomButton title="Delete" onPress={() => handleRemove(index)} />
+              <CustomButton title="Edit" onPress={() => handleEdit(index)} />
               <CustomButton title="Expand" onPress={() => handleExpand(index)}/>
             </View>
           </View>
@@ -201,6 +233,43 @@ function AnnouncementScreenContent({ navigation }) {
           <Button title="Cancel" onPress={closeModal} />
         </ScrollView>
       </Modal>
+
+      <Modal isVisible={isEditModalVisible} onBackdropPress={closeModal}>
+        <ScrollView contentContainerStyle={styles.modalContainerCreate}>
+          <Text>Title:</Text>
+          <TextInput
+            placeholder="Enter title"
+            value={editModalInput.title}
+            onChangeText={(text) => setEditModalInput({ ...editModalInput, title: text })}
+            style={styles.modalInput}
+          />
+          <Text>Author:</Text>
+          <TextInput
+            placeholder="Enter author"
+            value={editModalInput.author}
+            onChangeText={(text) => setEditModalInput({ ...editModalInput, author: text })}
+            style={styles.modalInput}
+          />
+          <Text>Date:</Text>
+          <TextInput
+            placeholder="Enter date"
+            value={editModalInput.date}
+            onChangeText={(text) => setEditModalInput({ ...editModalInput, date: text })}
+            style={styles.modalInput}
+          />
+          <Text>Announcement:</Text>
+          <TextInput
+            multiline
+            numberOfLines={4}
+            value={editModalInput.announcement}
+            onChangeText={(text) => setEditModalInput({ ...editModalInput, announcement: text })}
+            style={[styles.modalInput, styles.modalTextArea]}
+          />
+          <Button title="Submit" onPress={handleEditSubmit} />
+          <Button title="Cancel" onPress={closeModal} />
+        </ScrollView>
+      </Modal>
+
 
     </ScrollView>
   );
