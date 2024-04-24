@@ -13,7 +13,26 @@ function HomeScreen() {
 
       <View style={styles.announcementsContainer}>
         <Text style={styles.sectionTitle}>Recent Announcements</Text>
-        {/* Placeholder for recent announcements */}
+
+        {/* Announcement 1 */}
+        <View style={styles.announcementItem}>
+          <Text style={styles.announcementTitle}>Title 1</Text>
+          <Text style={styles.announcementAuthor}>Author 1</Text>
+          <Text style={styles.announcementDate}>Date 1</Text>
+          <Text style={styles.announcementContent}>
+            This is a placeholder for announcement content 1.
+          </Text>
+        </View>
+
+        {/* Announcement 2 */}
+        <View style={styles.announcementItem}>
+          <Text style={styles.announcementTitle}>Title 2</Text>
+          <Text style={styles.announcementAuthor}>Author 2</Text>
+          <Text style={styles.announcementDate}>Date 2</Text>
+          <Text style={styles.announcementContent}>
+            This is a placeholder for announcement content 2.
+          </Text>
+        </View>
       </View>
 
       <View style={styles.eventsContainer}>
@@ -58,6 +77,38 @@ const styles = StyleSheet.create({
     elevation: 5,
     marginBottom: 16,
   },
+  announcementItem: {
+    backgroundColor: 'white',
+    padding: 16,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    marginBottom: 16,
+  },
+  announcementTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
+  announcementAuthor: {
+    fontSize: 14,
+    color: '#555',
+    marginBottom: 4,
+  },
+  announcementDate: {
+    fontSize: 14,
+    color: '#555',
+    marginBottom: 4,
+  },
+  announcementContent: {
+    fontSize: 14,
+    color: '#333',
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
   eventsContainer: {
     backgroundColor: '#F5F5F5',
     padding: 16,
@@ -70,11 +121,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 8,
   },
 });
 
