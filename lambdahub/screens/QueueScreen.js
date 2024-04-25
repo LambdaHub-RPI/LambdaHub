@@ -16,6 +16,7 @@ import { Picker } from '@react-native-picker/picker';
 const QueueScreen = () => {
   const [rides, setRides] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
+  const [promptVisible, setPromptVisible] = useState(false);
   const [newRide, setNewRide] = useState({
     name: '',
     startlocation: '',
@@ -27,7 +28,6 @@ const QueueScreen = () => {
   useEffect(() => {
     fetchRides();
   }, []);
-
   const fetchRides = async () => {
     try {
       const response = await fetch('http://127.0.0.1:8000/ride-api/rides/');

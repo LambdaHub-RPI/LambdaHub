@@ -1,7 +1,7 @@
 import React from 'react';
-import { StyleSheet, View, Text, Animated, PanResponder } from 'react-native';
+import { StyleSheet, View, Text, Animated, PanResponder, HapticFeedback } from 'react-native';
 
-const QueueItem = ({ data, onDelete }) => {
+const QueueItem = ({ data, onDelete, swipeThreshold = 100 }) => {
   const pan = new Animated.ValueXY();
 
   // Setup the pan responder to handle user gestures
@@ -9,11 +9,10 @@ const QueueItem = ({ data, onDelete }) => {
     onStartShouldSetPanResponder: () => true,
     onPanResponderMove: Animated.event([null, { dx: pan.x }], { useNativeDriver: false }),
     onPanResponderRelease: () => {
-      // Check if the swipe distance is sufficient to trigger deletion
-      if (pan.x._value > 100) { // Threshold for a significant swipe to the right
-        onDelete(data.identifier); // Call the onDelete function passed from the parent component
+      if (pan.x._value > swipeThreshold) {
+        HapticFeedback.trigger('impactLight');
+        onDelete(data.identifier);
       } else {
-        // Reset the animation if not swiped far enough
         Animated.spring(pan, {
           toValue: { x: 0, y: 0 },
           friction: 5,
@@ -23,13 +22,34 @@ const QueueItem = ({ data, onDelete }) => {
     },
   });
 
-  // Formatting rideTime for display
-  const formattedTime = new Date('1970-01-01T' + data.rideTime + 'Z').toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  // Swipe color change effect
+  const swipeOutputRange = pan.x.interpolate({
+    inputRange: [0, 100],
+    outputRange: ['#FFFFFF', '#FF6347'], // Background color changes as user swipes
+    extrapolate: 'clamp',
+  });
+
+  const animatedStyle = {
+    backgroundColor: swipeOutputRange,
+  };
+
+  const formattedTime = new Date('1970-01-01T' + data.rideTime + 'Z').toLocaleTimeString([], {
+    hour: '2-digit',
+    minute: '2-digit'
+  });
 
   return (
     <Animated.View
-      style={[styles.itemContainer, { transform: [{ translateX: pan.x }] }, data.isEmergency && styles.emergencyItem]}
+      style={[
+        styles.itemContainer,
+        { transform: [{ translateX: pan.x }] },
+        data.isEmergency && styles.emergencyItem,
+        animatedStyle
+      ]}
       {...panResponder.panHandlers}
+      accessible
+      accessibilityLabel="Swipe to delete"
+      accessibilityHint="Swipe right to delete the item"
     >
       <View style={styles.content}>
         <Text style={styles.name}>{data.name}</Text>
@@ -58,7 +78,6 @@ const styles = StyleSheet.create({
   itemContainer: {
     padding: 10,
     marginVertical: 8,
-    backgroundColor: '#FFFFFF',
     borderRadius: 10,
     elevation: 3,
     shadowRadius: 3,
